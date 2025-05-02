@@ -7,12 +7,12 @@ const ESCALA = 0.2
 const RADIO = 1
 
 # Constantes de velocidad
-const VELOCIDAD_BASE = 0.9
+const VELOCIDAD_BASE = 0.5
 const VELOCIDAD_MOVIMIENTO = 1.7 * VELOCIDAD_BASE
 const VELOCIDAD_ROTACION = 0.05 * VELOCIDAD_BASE
 
 # Constantes de dimensiones y umbrales
-const DISTANCIA_ENTRE_PATAS = 30 * ESCALA
+const DISTANCIA_ENTRE_PATAS = 10 * ESCALA
 const LONGITUD_PASO = 90 * ESCALA
 const UMBRAL_DISTANCIA = 60 * ESCALA
 const UMBRAL_PATAS = 40 * ESCALA
@@ -301,6 +301,9 @@ func calcular_siguiente_posicion_delantera(izquierda):
 	# Ajustar altura según el terreno
 	pos = Vector3(pos.x, obtener_punto_mas_alto(pos.x, pos.z, "suelo").y, pos.z)
 	return pos
+	
+func obtener_patas():
+	return patas
 
 func obtener_punto_mas_alto(x, z, grupo_nombre):
 	# Raycast para detectar altura del terreno
