@@ -9,6 +9,10 @@ func _process(delta):
 		return
 
 	var center = objetivo.call("obtener_centro")
+	global_transform.origin = center
+
+	var dir = objetivo.call("obtener_direccion")
 	
-	var offset = Vector3(0, 0, 0)
-	global_transform.origin = center + offset
+	var angle_y = atan2(dir.x, dir.z)
+	global_transform.basis = Basis(Vector3.UP, angle_y)
+	rotate_y(deg2rad(-90)) # modelo mira a -X

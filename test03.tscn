@@ -2,13 +2,13 @@
 
 [ext_resource path="res://main.gd" type="Script" id=1]
 [ext_resource path="res://Camera.gd" type="Script" id=2]
-[ext_resource path="res://cat.glb" type="PackedScene" id=3]
+[ext_resource path="res://cat.tscn" type="PackedScene" id=3]
 [ext_resource path="res://cat.gd" type="Script" id=4]
 
 [sub_resource type="Environment" id=1]
-background_energy = 2.52
-ambient_light_color = Color( 0.270588, 0.270588, 0.270588, 1 )
-fog_enabled = true
+background_mode = 1
+background_energy = 0.0
+ambient_light_energy = 0.0
 
 [sub_resource type="Shader" id=4]
 code = "shader_type canvas_item;
@@ -45,8 +45,8 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.87417 )
 environment = SubResource( 1 )
 current = true
 fov = 82.6
-near = 12.16
-far = 297.4
+near = 0.1
+far = 296.9
 script = ExtResource( 2 )
 objetivo_path = NodePath("..")
 distancia = 70.0
@@ -55,7 +55,7 @@ angulo = 35.0
 
 [node name="DirectionalLight" type="DirectionalLight" parent="Camera"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 24.4069, 0 )
-light_energy = 0.5
+light_energy = 0.1
 shadow_enabled = true
 directional_shadow_max_distance = 193.7
 
@@ -128,6 +128,6 @@ shape = SubResource( 2 )
 mesh = SubResource( 3 )
 
 [node name="cat" parent="." instance=ExtResource( 3 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, -17 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 5.45762, 1.00007, -10.3752 )
 script = ExtResource( 4 )
 objetivo_path = NodePath("..")

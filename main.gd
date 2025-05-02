@@ -248,6 +248,15 @@ func distancia(p1, p2):
 	var pb = Vector2(p2.x, p2.z)
 	return (pa - pb).length()
 
+func obtener_direccion():
+	return direccion
+	
+func obtener_vel_rot():
+	return VELOCIDAD_ROTACION
+	
+func obtener_target():
+	return punto_objetivo
+
 func obtener_centro():
 	# Calcular el centro del cuadrúpedo basado en las posiciones de las patas
 	var posiciones = []
