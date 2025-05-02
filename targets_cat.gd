@@ -13,6 +13,9 @@ onready var ik_backR = $"RootNode (gltf orientation matrix)/RootNode (model corr
 onready var ik_frontL = $"RootNode (gltf orientation matrix)/RootNode (model correction matrix)/catfbx/Node_3/RootNode/Armature/Skeleton/ik_frontL"
 onready var ik_frontR = $"RootNode (gltf orientation matrix)/RootNode (model correction matrix)/catfbx/Node_3/RootNode/Armature/Skeleton/ik_frontR"
 
+
+onready var hueso =  $"RootNode (gltf orientation matrix)/RootNode (model correction matrix)/catfbx/Node_3/RootNode/Armature/Skeleton"
+
 func update_root_pos_rot():
 	var center = objetivo.call("obtener_centro")
 	center.y = center.y - offset_y
@@ -30,7 +33,14 @@ func update_targets_pos():
 	t_backR.global_position = patas["backR"]
 	t_frontL.global_position = patas["frontL"]
 	t_frontR.global_position = patas["frontR"]
+	
+func update_hips_positions():
+	pass
 
+func update_column():
+	update_hips_positions()
+	#hueso1, hueso2 positions = get_center_column_positions()
+	pass
 
 func _process(delta):
 	if not objetivo:
@@ -44,6 +54,7 @@ func _process(delta):
 		
 	update_root_pos_rot()
 	update_targets_pos()
+	update_column()
 
 
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://main.gd" type="Script" id=1]
 [ext_resource path="res://Camera.gd" type="Script" id=2]
@@ -17,29 +17,6 @@ fog_color = Color( 0, 0, 0, 1 )
 auto_exposure_enabled = true
 auto_exposure_scale = 0.3
 
-[sub_resource type="Shader" id=4]
-code = "shader_type canvas_item;
-
-uniform vec2 pixel_size = vec2(255.0, 150.0); // resolución pixelada
-//uniform vec2 pixel_size = vec2(1020.0, 600.0); // resolución pixelada
-uniform float contrast = 1.5; // >1 = más contraste
-
-void fragment() {
-    vec2 uv = floor(SCREEN_UV * pixel_size) / pixel_size;
-    vec4 col = texture(SCREEN_TEXTURE, uv);
-
-    // Aumentar contraste alrededor de 0.5
-    col.rgb = (col.rgb - 0.5) * contrast + 0.5;
-
-    COLOR = col;
-}
-"
-
-[sub_resource type="ShaderMaterial" id=5]
-shader = SubResource( 4 )
-shader_param/pixel_size = Vector2( 255, 150 )
-shader_param/contrast = 1.5
-
 [sub_resource type="BoxShape" id=2]
 
 [sub_resource type="CubeMesh" id=3]
@@ -56,20 +33,15 @@ near = 0.1
 far = 296.9
 script = ExtResource( 2 )
 objetivo_path = NodePath("..")
-distancia = 120.0
+distancia = 25.0
 altura = 20.0
-angulo = 35.0
+angulo = 15.0
 
 [node name="DirectionalLight" type="DirectionalLight" parent="Camera"]
 transform = Transform( 0.193705, 0.864049, 0.464648, -0.980575, 0.155621, 0.119397, 0.0308556, -0.47875, 0.877409, 0, 24.4069, 4.76837e-07 )
 light_energy = 0.2
 shadow_enabled = true
 directional_shadow_max_distance = 193.7
-
-[node name="ColorRect" type="ColorRect" parent="Camera"]
-material = SubResource( 5 )
-margin_right = 1026.0
-margin_bottom = 605.0
 
 [node name="StaticBody" type="StaticBody" parent="." groups=["suelo"]]
 transform = Transform( 100.299, 0, 0, 0, 1, 0, 0, 0, 130.548, 0.0563974, 0, 0 )
