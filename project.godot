@@ -11,7 +11,7 @@ config_version=4
 [application]
 
 config/name="tes03_godot_cat"
-run/main_scene="res://test03.tscn"
+run/main_scene="res://scenes/test03.tscn"
 config/icon="res://icon.png"
 
 [display]

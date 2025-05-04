@@ -1,0 +1,39 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://scenes/cat2.glb" type="PackedScene" id=1]
+[ext_resource path="res://scripts/targets_cat.gd" type="Script" id=2]
+
+[node name="cat" instance=ExtResource( 1 )]
+script = ExtResource( 2 )
+
+[node name="ik_backL" type="SkeletonIK" parent="RootNode (gltf orientation matrix)/RootNode (model correction matrix)/catfbx/Node_3/RootNode/Armature/Skeleton" index="3"]
+process_priority = 1
+root_bone = "j_l_femur_050"
+tip_bone = "j_l_ball_053"
+target_node = NodePath("../../t_backL")
+
+[node name="ik_backR" type="SkeletonIK" parent="RootNode (gltf orientation matrix)/RootNode (model correction matrix)/catfbx/Node_3/RootNode/Armature/Skeleton" index="4"]
+process_priority = 1
+root_bone = "j_r_femur_055"
+tip_bone = "j_r_ball_058"
+target_node = NodePath("../../t_backR")
+
+[node name="ik_frontL" type="SkeletonIK" parent="RootNode (gltf orientation matrix)/RootNode (model correction matrix)/catfbx/Node_3/RootNode/Armature/Skeleton" index="5"]
+process_priority = 1
+root_bone = "j_l_humerous_031"
+tip_bone = "j_l_palm_034"
+target_node = NodePath("../../t_frontL")
+
+[node name="ik_frontR" type="SkeletonIK" parent="RootNode (gltf orientation matrix)/RootNode (model correction matrix)/catfbx/Node_3/RootNode/Armature/Skeleton" index="6"]
+process_priority = 1
+root_bone = "j_r_humerous_037"
+tip_bone = "j_r_palm_040"
+target_node = NodePath("../../t_frontR")
+
+[node name="t_backL" type="Position3D" parent="RootNode (gltf orientation matrix)/RootNode (model correction matrix)/catfbx/Node_3/RootNode/Armature" index="3"]
+
+[node name="t_backR" type="Position3D" parent="RootNode (gltf orientation matrix)/RootNode (model correction matrix)/catfbx/Node_3/RootNode/Armature" index="4"]
+
+[node name="t_frontL" type="Position3D" parent="RootNode (gltf orientation matrix)/RootNode (model correction matrix)/catfbx/Node_3/RootNode/Armature" index="5"]
+
+[node name="t_frontR" type="Position3D" parent="RootNode (gltf orientation matrix)/RootNode (model correction matrix)/catfbx/Node_3/RootNode/Armature" index="6"]
