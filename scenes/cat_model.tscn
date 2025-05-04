@@ -8,19 +8,18 @@
 script = ExtResource( 3 )
 
 [node name="Cube001" parent="metarig/Skeleton" index="0"]
-visible = false
 software_skinning_transform_normals = false
 material/0 = ExtResource( 2 )
 
 [node name="ik_backL" type="SkeletonIK" parent="metarig/Skeleton" index="1"]
 process_priority = 1
-root_bone = "pelvis.L"
+root_bone = "thigh.L"
 tip_bone = "r_toe.L"
 target_node = NodePath("../../t_backL")
 
 [node name="ik_backR" type="SkeletonIK" parent="metarig/Skeleton" index="2"]
 process_priority = 1
-root_bone = "pelvis.R"
+root_bone = "thigh.R"
 tip_bone = "r_toe.R"
 target_node = NodePath("../../t_backR")
 
@@ -43,3 +42,5 @@ target_node = NodePath("../../t_frontR")
 [node name="t_frontL" type="Position3D" parent="metarig" index="3"]
 
 [node name="t_frontR" type="Position3D" parent="metarig" index="4"]
+
+[node name="ImmediateGeometry" type="ImmediateGeometry" parent="." index="1"]
