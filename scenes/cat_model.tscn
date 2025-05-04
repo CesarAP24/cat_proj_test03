@@ -8,6 +8,7 @@
 script = ExtResource( 3 )
 
 [node name="Cube001" parent="metarig/Skeleton" index="0"]
+visible = false
 software_skinning_transform_normals = false
 material/0 = ExtResource( 2 )
 

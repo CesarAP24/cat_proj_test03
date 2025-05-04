@@ -36,6 +36,7 @@ objetivo_path = NodePath("..")
 distancia = 30.0
 altura = 3.0
 angulo = 35.0
+invertir_x = true
 
 [node name="DirectionalLight" type="DirectionalLight" parent="Camera"]
 transform = Transform( 0.193705, 0.864049, 0.464648, -0.980575, 0.155621, 0.119397, 0.0308556, -0.47875, 0.877409, 0, 24.4069, 4.76837e-07 )
@@ -44,7 +45,6 @@ shadow_enabled = true
 directional_shadow_max_distance = 193.7
 
 [node name="cat_model" parent="." instance=ExtResource( 3 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.74043, 1.00001, -27.0602 )
 objetivo_path = NodePath("..")
 
 [node name="Spatial" type="Spatial" parent="."]

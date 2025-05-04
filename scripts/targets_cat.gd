@@ -25,7 +25,6 @@ func update_root_pos_rot():
 	
 	var angle_y = atan2(dir.x, dir.z)
 	global_transform.basis = Basis(Vector3.UP, angle_y)
-	#rotate_y(deg2rad(-90)) # modelo mira a -X
 
 func update_targets_pos():
 	var patas = objetivo.call("obtener_patas")
@@ -33,13 +32,9 @@ func update_targets_pos():
 	t_backR.global_position = patas["backR"]
 	t_frontL.global_position = patas["frontL"]
 	t_frontR.global_position = patas["frontR"]
-	
-func update_hips_positions():
-	pass
+
 
 func update_column():
-	update_hips_positions()
-	#hueso1, hueso2 positions = get_center_column_positions()
 	pass
 
 func _process(delta):
