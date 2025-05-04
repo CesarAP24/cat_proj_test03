@@ -7,12 +7,12 @@ const ESCALA = 0.05
 const RADIO = 0.2
 
 # Constantes de velocidad
-const VELOCIDAD_BASE = 1
+const VELOCIDAD_BASE = 0.5
 const VELOCIDAD_MOVIMIENTO = 1.1 * VELOCIDAD_BASE
 const VELOCIDAD_ROTACION = 0.05 * VELOCIDAD_BASE
 
 # Constantes de dimensiones y umbrales
-const DISTANCIA_ENTRE_PATAS = 5 * ESCALA
+const DISTANCIA_ENTRE_PATAS = 30 * ESCALA
 const LONGITUD_PASO = 120 * ESCALA
 const UMBRAL_DISTANCIA = 60 * ESCALA
 const UMBRAL_PATAS = 40 * ESCALA
@@ -109,7 +109,7 @@ func crear_material(color):
 # FUNCIONES DE ENTRADA Y PROCESO
 # ----------------------------
 func manejar_movimiento_objetivo():
-	var velocidad_objetivo = 0.2
+	var velocidad_objetivo = 0.1
 	punto_objetivo.y = obtener_centro().y+3
 	if Input.is_key_pressed(KEY_W):
 		punto_objetivo.z += velocidad_objetivo

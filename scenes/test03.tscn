@@ -33,8 +33,8 @@ near = 0.1
 far = 296.9
 script = ExtResource( 2 )
 objetivo_path = NodePath("..")
-distancia = 30.0
-altura = 3.0
+distancia = 10.0
+altura = 1.0
 angulo = 35.0
 
 [node name="DirectionalLight" type="DirectionalLight" parent="Camera"]
@@ -44,71 +44,70 @@ shadow_enabled = true
 directional_shadow_max_distance = 193.7
 
 [node name="cat_model" parent="." instance=ExtResource( 3 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.74043, 1.00001, -27.0602 )
 objetivo_path = NodePath("..")
 
-[node name="Spatial" type="Spatial" parent="."]
+[node name="colliders" type="Spatial" parent="."]
 transform = Transform( 0.386736, 0, 0, 0, 0.330699, 0, 0, 0, 0.450555, 0, 0, 0 )
 
-[node name="StaticBody" type="StaticBody" parent="Spatial" groups=["suelo"]]
+[node name="StaticBody" type="StaticBody" parent="colliders" groups=["suelo"]]
 transform = Transform( 100.299, 0, 0, 0, 1, 0, 0, 0, 130.548, 0.0563974, 0, 0 )
 
-[node name="CollisionShape" type="CollisionShape" parent="Spatial/StaticBody" groups=["suelo"]]
+[node name="CollisionShape" type="CollisionShape" parent="colliders/StaticBody" groups=["suelo"]]
 shape = SubResource( 2 )
 
-[node name="MeshInstance" type="MeshInstance" parent="Spatial/StaticBody" groups=["suelo"]]
+[node name="MeshInstance" type="MeshInstance" parent="colliders/StaticBody" groups=["suelo"]]
 mesh = SubResource( 3 )
 
-[node name="StaticBody2" type="StaticBody" parent="Spatial" groups=["suelo"]]
+[node name="StaticBody2" type="StaticBody" parent="colliders" groups=["suelo"]]
 transform = Transform( 18.3637, 0, 0, 0, 4.93207, 0, 0, 0, 124.695, 111.945, 2.66997, 0 )
 
-[node name="CollisionShape" type="CollisionShape" parent="Spatial/StaticBody2" groups=["suelo"]]
+[node name="CollisionShape" type="CollisionShape" parent="colliders/StaticBody2" groups=["suelo"]]
 shape = SubResource( 2 )
 
-[node name="MeshInstance" type="MeshInstance" parent="Spatial/StaticBody2" groups=["suelo"]]
+[node name="MeshInstance" type="MeshInstance" parent="colliders/StaticBody2" groups=["suelo"]]
 mesh = SubResource( 3 )
 
-[node name="StaticBody4" type="StaticBody" parent="Spatial" groups=["suelo"]]
+[node name="StaticBody4" type="StaticBody" parent="colliders" groups=["suelo"]]
 transform = Transform( 18.3637, 0, 0, 0, 4.93207, 0, 0, 0, 124.695, 137.715, 11.7378, 0 )
 
-[node name="CollisionShape" type="CollisionShape" parent="Spatial/StaticBody4" groups=["suelo"]]
+[node name="CollisionShape" type="CollisionShape" parent="colliders/StaticBody4" groups=["suelo"]]
 shape = SubResource( 2 )
 
-[node name="MeshInstance" type="MeshInstance" parent="Spatial/StaticBody4" groups=["suelo"]]
+[node name="MeshInstance" type="MeshInstance" parent="colliders/StaticBody4" groups=["suelo"]]
 mesh = SubResource( 3 )
 
-[node name="StaticBody5" type="StaticBody" parent="Spatial" groups=["suelo"]]
+[node name="StaticBody5" type="StaticBody" parent="colliders" groups=["suelo"]]
 transform = Transform( 18.3637, 0, 0, 0, 4.93207, 0, 0, 0, 124.695, 172.091, 20.0696, 0 )
 
-[node name="CollisionShape" type="CollisionShape" parent="Spatial/StaticBody5" groups=["suelo"]]
+[node name="CollisionShape" type="CollisionShape" parent="colliders/StaticBody5" groups=["suelo"]]
 shape = SubResource( 2 )
 
-[node name="MeshInstance" type="MeshInstance" parent="Spatial/StaticBody5" groups=["suelo"]]
+[node name="MeshInstance" type="MeshInstance" parent="colliders/StaticBody5" groups=["suelo"]]
 mesh = SubResource( 3 )
 
-[node name="StaticBody7" type="StaticBody" parent="Spatial" groups=["suelo"]]
+[node name="StaticBody7" type="StaticBody" parent="colliders" groups=["suelo"]]
 transform = Transform( 25.4675, 0, 0, 0, 4.87459, 0, 0, 0, 48.0733, -73.5556, 4.65085, 86.8465 )
 
-[node name="CollisionShape" type="CollisionShape" parent="Spatial/StaticBody7" groups=["suelo"]]
+[node name="CollisionShape" type="CollisionShape" parent="colliders/StaticBody7" groups=["suelo"]]
 shape = SubResource( 2 )
 
-[node name="MeshInstance" type="MeshInstance" parent="Spatial/StaticBody7" groups=["suelo"]]
+[node name="MeshInstance" type="MeshInstance" parent="colliders/StaticBody7" groups=["suelo"]]
 mesh = SubResource( 3 )
 
-[node name="StaticBody6" type="StaticBody" parent="Spatial" groups=["suelo"]]
+[node name="StaticBody6" type="StaticBody" parent="colliders" groups=["suelo"]]
 transform = Transform( 18.3637, 0, 0, 0, 4.93207, 0, 0, 0, 124.695, 197.862, 29.1375, 0 )
 
-[node name="CollisionShape" type="CollisionShape" parent="Spatial/StaticBody6" groups=["suelo"]]
+[node name="CollisionShape" type="CollisionShape" parent="colliders/StaticBody6" groups=["suelo"]]
 shape = SubResource( 2 )
 
-[node name="MeshInstance" type="MeshInstance" parent="Spatial/StaticBody6" groups=["suelo"]]
+[node name="MeshInstance" type="MeshInstance" parent="colliders/StaticBody6" groups=["suelo"]]
 mesh = SubResource( 3 )
 
-[node name="StaticBody3" type="StaticBody" parent="Spatial" groups=["suelo"]]
+[node name="StaticBody3" type="StaticBody" parent="colliders" groups=["suelo"]]
 transform = Transform( 98.0297, 3.00777, 0, -19.9706, 7.5905, 0, 0, 0, 121.9, -198.061, 23.5105, 0 )
 
-[node name="CollisionShape" type="CollisionShape" parent="Spatial/StaticBody3" groups=["suelo"]]
+[node name="CollisionShape" type="CollisionShape" parent="colliders/StaticBody3" groups=["suelo"]]
 shape = SubResource( 2 )
 
-[node name="MeshInstance" type="MeshInstance" parent="Spatial/StaticBody3" groups=["suelo"]]
+[node name="MeshInstance" type="MeshInstance" parent="colliders/StaticBody3" groups=["suelo"]]
 mesh = SubResource( 3 )
