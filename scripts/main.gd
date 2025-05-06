@@ -8,16 +8,17 @@ const RADIO = 0.1
 
 # Constantes de velocidad
 const VELOCIDAD_BASE = 1.2
-const VELOCIDAD_MOVIMIENTO = 1 * VELOCIDAD_BASE
+const VELOCIDAD_MOVIMIENTO = 0.9 * VELOCIDAD_BASE
 const VELOCIDAD_ROTACION = 0.04 * VELOCIDAD_BASE
 
 # Constantes de dimensiones y umbrales
-const DISTANCIA_ENTRE_PATAS = 5 * ESCALA
-const LONGITUD_PASO = 200 * ESCALA
+const DISTANCIA_ENTRE_PATAS = 10 * ESCALA
+const LONGITUD_PASO = 205 * ESCALA
 const UMBRAL_DISTANCIA = 150 * ESCALA
-const UMBRAL_PATAS_FRONT = 60 * ESCALA
+const UMBRAL_PATAS_FRONT = 80 * ESCALA
 const UMBRAL_PATAS_BACK = 70*ESCALA
-const ALTURA_PASO = 35* ESCALA
+const ALTURA_PASO = 60* ESCALA
+const RANDOM_DISTANCE = 0.5
 
 const MOVEMENT_TARGET_SPEED = 2;
 
@@ -147,7 +148,7 @@ func actualizar_maquina_estados():
 
 func cambiar_estado(nuevo_estado):
 	estado_actual = nuevo_estado
-	
+	var ran_vec = Vector3(randf() * RANDOM_DISTANCE, 0, randf() * RANDOM_DISTANCE)
 	match nuevo_estado:
 		Estado.PASO_1:
 			pass  # No hay acción específica para este estado
@@ -160,7 +161,7 @@ func cambiar_estado(nuevo_estado):
 		
 		Estado.PASO_3:
 			# Mover pata delantera derecha
-			objetivos["frontR"] = calcular_siguiente_posicion_delantera(false)
+			objetivos["frontR"] = calcular_siguiente_posicion_delantera(false) + ran_vec
 			posiciones_iniciales["frontR"] = patas["frontR"]
 			progreso_movimiento["frontR"] = 0.0
 		
@@ -172,7 +173,7 @@ func cambiar_estado(nuevo_estado):
 		
 		Estado.PASO_5:
 			# Mover pata delantera izquierda
-			objetivos["frontL"] = calcular_siguiente_posicion_delantera(true)
+			objetivos["frontL"] = calcular_siguiente_posicion_delantera(true) + ran_vec
 			posiciones_iniciales["frontL"] = patas["frontL"]
 			progreso_movimiento["frontL"] = 0.0
 
