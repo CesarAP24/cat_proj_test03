@@ -1,32 +1,32 @@
 
-extends Spatial
+extends Node3D
 
-export(NodePath) var objetivo_path
-export(float) var offset_y
+@export var objetivo_path: NodePath
+@export var offset_y: float
 
-onready var objetivo = get_node(objetivo_path)
-onready var t_backL = $metarig/t_backL
-onready var t_backR = $metarig/t_backR
-onready var t_frontL = $metarig/t_frontL
-onready var t_frontR = $metarig/t_frontR
-onready var ik_backL = $metarig/Skeleton/ik_backL
-onready var ik_backR = $metarig/Skeleton/ik_backR
-onready var ik_frontL = $metarig/Skeleton/ik_frontL
-onready var ik_frontR = $metarig/Skeleton/ik_frontR
-export(float) var spring_stiffness = 250.0  # Controls how strongly the spring pulls
-export(float) var spring_damping = 15  # Controls how quickly oscillations settle
-export(float) var mass = 1.0             # Simulated mass of the head
+@onready var objetivo = get_node(objetivo_path)
+@onready var t_backL = $metarig/t_backL
+@onready var t_backR = $metarig/t_backR
+@onready var t_frontL = $metarig/t_frontL
+@onready var t_frontR = $metarig/t_frontR
+@onready var ik_backL = $metarig/Skeleton3D/ik_backL
+@onready var ik_backR = $metarig/Skeleton3D/ik_backR
+@onready var ik_frontL = $metarig/Skeleton3D/ik_frontL
+@onready var ik_frontR = $metarig/Skeleton3D/ik_frontR
+@export var spring_stiffness: float = 250.0  # Controls how strongly the spring pulls
+@export var spring_damping: float = 15  # Controls how quickly oscillations settle
+@export var mass: float = 1.0             # Simulated mass of the head
 
-onready var helper = 0
+@onready var helper = 0
 
 
-onready var hueso =  $metarig/Skeleton
+@onready var hueso =  $metarig/Skeleton3D
 
 # Añade un nodo ImmediateGeometry como hijo de tu nodo raíz
-onready var debug_geometry = ImmediateGeometry.new()
-onready var debug_material = SpatialMaterial.new()
+@onready var debug_geometry = ImmediateMesh.new()
+@onready var debug_material = StandardMaterial3D.new()
 
-onready var basis_pos = []
+@onready var basis_pos = []
 
 var velocity = Vector3.ZERO
 var current_head_pos = Vector3.ZERO
@@ -51,7 +51,7 @@ func update_targets_pos():
 
 
 # Función que obtiene la posición global de los huesos
-func get_positions_vector3(bones: Array, skeleton: Skeleton) -> Array:
+func get_positions_vector3(bones: Array, skeleton: Skeleton3D) -> Array:
 	var positions = []
 	for bone_name in bones:
 		var idx = skeleton.find_bone(bone_name)
@@ -81,7 +81,7 @@ func get_solution_column(target: Vector3, puntos: Array) -> Array:
 
 
 # Función para actualizar la columna
-func update_column(skeleton: Skeleton, bones: Array, target: Vector3, delta: float):
+func update_column(skeleton: Skeleton3D, bones: Array, target: Vector3, delta: float):
 	# Spring physics simulation
 	var desired_pos = target
 	var current_pos = current_head_pos
@@ -140,13 +140,7 @@ func update_magnet_pos():
 	ik_frontR.magnet = t_backR.position;
 	
 
-
 func _ready():
-	add_child(debug_geometry)
-	debug_material.flags_unshaded = true
-	debug_material.vertex_color_use_as_albedo = true
-	
-
 	ik_backL.start()
 	ik_backR.start()
 	ik_frontL.start()
@@ -190,55 +184,7 @@ func _process(delta):
 		print("Spring damping: ", spring_damping)
 		
 	# Limpiar geometría anterior
-	debug_geometry.clear()
 	update_targets_pos()
 	update_column(hueso, ["spine","spine.001","spine.002","spine.003","spine.004"], get_target_pos(), delta)
 	update_magnet_pos()
 	
-	# Optional: Visualize spring target and current head position
-	debug_geometry.begin(Mesh.PRIMITIVE_LINES)
-	
-	# Draw target position in yellow
-	debug_geometry.set_color(Color.yellow)
-	var target_pos = get_target_pos()
-	debug_geometry.add_vertex(target_pos + Vector3(0, 1, 0))
-	debug_geometry.add_vertex(target_pos + Vector3(0, -1, 0))
-	debug_geometry.add_vertex(target_pos + Vector3(1, 0, 0))
-	debug_geometry.add_vertex(target_pos + Vector3(-1, 0, 0))
-	debug_geometry.add_vertex(target_pos + Vector3(0, 0, 1))
-	debug_geometry.add_vertex(target_pos + Vector3(0, 0, -1))
-	
-	# Draw current head position in cyan
-	debug_geometry.set_color(Color.cyan)
-	debug_geometry.add_vertex(current_head_pos + Vector3(0, 0.8, 0))
-	debug_geometry.add_vertex(current_head_pos + Vector3(0, -0.8, 0))
-	debug_geometry.add_vertex(current_head_pos + Vector3(0.8, 0, 0))
-	debug_geometry.add_vertex(current_head_pos + Vector3(-0.8, 0, 0))
-	debug_geometry.add_vertex(current_head_pos + Vector3(0, 0, 0.8))
-	debug_geometry.add_vertex(current_head_pos + Vector3(0, 0, -0.8))
-	
-	debug_geometry.end()
-
-func draw_bone_axes(bone_name: String):
-	var bone_idx = $metarig/Skeleton.find_bone(bone_name)
-	if bone_idx == -1:
-		return
-		
-	var transform = $metarig/Skeleton.get_bone_global_pose(bone_idx)
-	var origin = transform.origin
-	var scale = 2  # Escala de las líneas
-	
-	# Dibujar eje X (rojo)
-	debug_geometry.set_color(Color.red)
-	debug_geometry.add_vertex(origin)
-	debug_geometry.add_vertex(origin + transform.basis.x * scale*5)
-	
-	# Dibujar eje Y (verde)
-	debug_geometry.set_color(Color.green)
-	debug_geometry.add_vertex(origin)
-	debug_geometry.add_vertex(origin + transform.basis.y * scale*100)
-	
-	# Dibujar eje Z (azul)
-	debug_geometry.set_color(Color.blue)
-	debug_geometry.add_vertex(origin)
-	debug_geometry.add_vertex(origin + transform.basis.z * scale)

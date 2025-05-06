@@ -1,4 +1,4 @@
-extends Spatial
+extends Node3D
 
 # CONFIGURACIÓN PRINCIPAL
 # ----------------------
@@ -77,7 +77,7 @@ func inicializar():
 func crear_representacion_visual():
 	# Crear esferas para las patas
 	for nombre in patas.keys():
-		var esfera = MeshInstance.new()
+		var esfera = MeshInstance3D.new()
 		esfera.name = "pata_" + nombre
 		esfera.mesh = SphereMesh.new()
 		esfera.scale = Vector3(RADIO, RADIO, RADIO)
@@ -88,7 +88,7 @@ func crear_representacion_visual():
 	# Crear esferas para objetivos (solo en modo debug)
 	if DEBUG:
 		for nombre in objetivos.keys():
-			var esfera = MeshInstance.new()
+			var esfera = MeshInstance3D.new()
 			esfera.name = "objetivo_" + nombre
 			esfera.mesh = SphereMesh.new()
 			esfera.scale = Vector3(RADIO * 0.5, RADIO * 0.5, RADIO * 0.5)
@@ -97,7 +97,7 @@ func crear_representacion_visual():
 			esferas["objetivo_" + nombre] = esfera
 
 		# Crear esfera para el punto objetivo
-		var objetivo_especial = MeshInstance.new()
+		var objetivo_especial = MeshInstance3D.new()
 		objetivo_especial.name = "punto_objetivo"
 		objetivo_especial.mesh = SphereMesh.new()
 		objetivo_especial.scale = Vector3(RADIO * 0.5, RADIO * 0.5, RADIO * 0.5)
@@ -106,7 +106,7 @@ func crear_representacion_visual():
 		esferas["punto_objetivo"] = objetivo_especial
 
 func crear_material(color):
-	var mat = SpatialMaterial.new()
+	var mat = StandardMaterial3D.new()
 	mat.albedo_color = color
 	return mat
 
@@ -207,7 +207,7 @@ func mover_patas(delta):
 
 func calcular_posicion_interpolada(pos_inicial, pos_final, progreso):
 	# Crear vector de posición interpolada para X y Z
-	var interpolacion_xz = pos_inicial.linear_interpolate(pos_final, progreso)
+	var interpolacion_xz = pos_inicial.lerp(pos_final, progreso)
 	
 	# Calcular altura usando una curva parabólica en lugar de senoidal
 	var altura_y = calcular_altura_parabola(pos_inicial, pos_final, progreso)
@@ -236,13 +236,13 @@ func calcular_altura_parabola(pos_inicial, pos_final, progreso):
 func actualizar_representacion_visual():
 	# Actualizar posiciones de las esferas de las patas
 	for nombre in patas.keys():
-		esferas["pata_" + nombre].translation = patas[nombre]
+		esferas["pata_" + nombre].position = patas[nombre]
 	
 	# Actualizar posiciones de las esferas de los objetivos (modo debug)
 	if DEBUG:
 		for nombre in objetivos.keys():
-			esferas["objetivo_" + nombre].translation = objetivos[nombre]
-		esferas["punto_objetivo"].translation = punto_objetivo
+			esferas["objetivo_" + nombre].position = objetivos[nombre]
+		esferas["punto_objetivo"].position = punto_objetivo
 
 # FUNCIONES UTILITARIAS
 # --------------------
@@ -348,14 +348,19 @@ func obtener_patas():
 
 func obtener_punto_mas_alto(x, z, grupo_nombre):
 	# Raycast para detectar altura del terreno
-	var origen = Vector3(x, obtener_centro().y+30, z)  # Rayo desde arriba
+	var origen = Vector3(x, obtener_centro().y + 30, z)  # Rayo desde arriba
 	var destino = Vector3(x, -1000, z)  # Hacia abajo
 	
 	# Obtener espacio de la escena
-	var espacio_estado = get_world().direct_space_state
+	var espacio_estado = get_world_3d().direct_space_state
+	
+	# Crear parámetros de la consulta de raycast
+	var parametros_ray = PhysicsRayQueryParameters3D.new()
+	parametros_ray.from = origen
+	parametros_ray.to = destino
 	
 	# Realizar el raycast
-	var resultado = espacio_estado.intersect_ray(origen, destino)
+	var resultado = espacio_estado.intersect_ray(parametros_ray)
 	
 	# Verificar resultado
 	if resultado and resultado.has("collider"):

@@ -1,0 +1,6 @@
+res://default_env.tres
+res://scenes/test03.tscn
+res://scripts/main.gd
+res://scripts/Camera.gd
+res://scripts/targets_cat.gd
+res://scenes/cat_model.tscn
