@@ -19,6 +19,8 @@ const UMBRAL_PATAS_FRONT = 60 * ESCALA
 const UMBRAL_PATAS_BACK = 70*ESCALA
 const ALTURA_PASO = 35* ESCALA
 
+const MOVEMENT_TARGET_SPEED = 2;
+
 # Opciones de debug
 const DEBUG = true
 
@@ -110,7 +112,7 @@ func crear_material(color):
 # FUNCIONES DE ENTRADA Y PROCESO
 # ----------------------------
 func manejar_movimiento_objetivo():
-	var velocidad_objetivo = 0.2*2
+	var velocidad_objetivo = 0.2*2*MOVEMENT_TARGET_SPEED
 	punto_objetivo.y = obtener_centro().y+3
 	if Input.is_key_pressed(KEY_W):
 		punto_objetivo.z += velocidad_objetivo
