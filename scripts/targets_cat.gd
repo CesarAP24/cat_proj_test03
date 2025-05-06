@@ -13,6 +13,9 @@ onready var ik_backL = $metarig/Skeleton/ik_backL
 onready var ik_backR = $metarig/Skeleton/ik_backR
 onready var ik_frontL = $metarig/Skeleton/ik_frontL
 onready var ik_frontR = $metarig/Skeleton/ik_frontR
+export(float) var spring_stiffness = 250.0  # Controls how strongly the spring pulls
+export(float) var spring_damping = 15  # Controls how quickly oscillations settle
+export(float) var mass = 1.0             # Simulated mass of the head
 
 onready var helper = 0
 
@@ -24,6 +27,9 @@ onready var debug_geometry = ImmediateGeometry.new()
 onready var debug_material = SpatialMaterial.new()
 
 onready var basis_pos = []
+
+var velocity = Vector3.ZERO
+var current_head_pos = Vector3.ZERO
 
 func update_root_pos_rot():
 	var center = objetivo.call("obtener_centro")
@@ -75,46 +81,55 @@ func get_solution_column(target: Vector3, puntos: Array) -> Array:
 
 
 # Función para actualizar la columna
-func update_column(skeleton: Skeleton, bones: Array, target: Vector3):
-	# Obtener las posiciones actuales de los huesos
+func update_column(skeleton: Skeleton, bones: Array, target: Vector3, delta: float):
+	# Spring physics simulation
+	var desired_pos = target
+	var current_pos = current_head_pos
+	
+	# Calculate spring force: F = -k * x - b * v
+	# where k is spring stiffness, x is displacement, b is damping, v is velocity
+	var displacement = current_pos - desired_pos
+	var spring_force = -spring_stiffness * displacement - spring_damping * velocity
+	
+	# Calculate acceleration (F = ma, so a = F/m)
+	var acceleration = spring_force / mass
+	
+	# Update velocity and position using verlet integration
+	velocity += acceleration * delta
+	current_head_pos += velocity * delta
+	
+	# Get original positions and generate solution with the spring-affected head position
 	var positions = get_positions_vector3(bones, skeleton)
+	positions = get_solution_column(current_head_pos, positions)
 	
-	# Obtener la solución de la columna IK
-	var positions_no_answer = positions
-	positions = get_solution_column(target, positions)
-	
-	# Actualizar la posición y rotación de los huesos
+	# Rest of your existing update_column code
 	for i in range(positions.size() - 1):
 		var current_bone = skeleton.find_bone(bones[i])
 		var pos = skeleton.get_bone_global_pose(current_bone)
-		var rest = skeleton.get_bone_rest(current_bone)
 		
-		pos.origin = positions[i]  # Establecer la posición de la raíz de la columna
+		pos.origin = positions[i]
 		
 		var basis = pos.basis
 		var dir = positions[i+1]-positions[i]
 		var dir_proj_zx = Vector3(dir.x, 0, dir.z)
-		var cruz = Vector3(0,0,10).cross(dir)
 		pos.basis = basis_pos[i].basis * Basis(Vector3.BACK, Vector3(0,0,10).signed_angle_to(dir_proj_zx, Vector3.DOWN))
 		
 		var vec_plane = pos.basis.x;
 		var point_plane = pos.origin;
 		var dir_proj_vec_plane = dir - dir.dot(vec_plane.normalized()) * vec_plane.normalized()
-
 		var front_proj_vec_plane = Vector3(dir_proj_vec_plane.x, 0, dir_proj_vec_plane.z)
 		
 		pos.basis *= Basis(basis_pos[i].basis.x.normalized(), -dir_proj_vec_plane.signed_angle_to(front_proj_vec_plane, pos.basis.x))
-		
-		print(helper)
-		
 		
 		skeleton.set_bone_global_pose_override(current_bone, pos, 1, true)
 
 func get_target_pos():
 	var patas = objetivo.call("obtener_patas")
-	var out = (patas["frontL"] + patas["frontR"])/2
-	out.y += offset_y/2
-	return out
+	if (patas):
+		var out = (patas["frontL"] + patas["frontR"])/2
+		out.y += offset_y/2
+		return out + objetivo.call("obtener_direccion")*1.5
+	return Vector3(0,0,0)
 	
 func update_magnet_pos():
 	ik_backL.magnet = t_frontL.position;
@@ -142,10 +157,11 @@ func _ready():
 		var pos = hueso.get_bone_global_pose(current_bone)
 		basis_pos.append(pos)
 		
+	current_head_pos = get_target_pos()
 
-func _process(_delta):
+		
 
-	
+func _process(delta):
 	if not objetivo:
 		return
 		
@@ -159,15 +175,49 @@ func _process(_delta):
 	if Input.is_key_pressed(KEY_T):
 		helper -= 0.1
 	
+	# Add these controls for spring parameters
+	if Input.is_key_pressed(KEY_U):
+		spring_stiffness += 0.1
+		print("Spring stiffness: ", spring_stiffness)
+	if Input.is_key_pressed(KEY_J):
+		spring_stiffness = max(0.1, spring_stiffness - 0.1)
+		print("Spring stiffness: ", spring_stiffness)
+	if Input.is_key_pressed(KEY_I):
+		spring_damping += 0.1
+		print("Spring damping: ", spring_damping)
+	if Input.is_key_pressed(KEY_K):
+		spring_damping = max(0.1, spring_damping - 0.1)
+		print("Spring damping: ", spring_damping)
 		
-		# Limpiar geometría anterior
+	# Limpiar geometría anterior
 	debug_geometry.clear()
 	update_targets_pos()
-	update_column(hueso, ["spine","spine.001","spine.002","spine.003","spine.004"], get_target_pos())
+	update_column(hueso, ["spine","spine.001","spine.002","spine.003","spine.004"], get_target_pos(), delta)
 	update_magnet_pos()
 	
+	# Optional: Visualize spring target and current head position
+	debug_geometry.begin(Mesh.PRIMITIVE_LINES)
 	
-	# Empezar a d
+	# Draw target position in yellow
+	debug_geometry.set_color(Color.yellow)
+	var target_pos = get_target_pos()
+	debug_geometry.add_vertex(target_pos + Vector3(0, 1, 0))
+	debug_geometry.add_vertex(target_pos + Vector3(0, -1, 0))
+	debug_geometry.add_vertex(target_pos + Vector3(1, 0, 0))
+	debug_geometry.add_vertex(target_pos + Vector3(-1, 0, 0))
+	debug_geometry.add_vertex(target_pos + Vector3(0, 0, 1))
+	debug_geometry.add_vertex(target_pos + Vector3(0, 0, -1))
+	
+	# Draw current head position in cyan
+	debug_geometry.set_color(Color.cyan)
+	debug_geometry.add_vertex(current_head_pos + Vector3(0, 0.8, 0))
+	debug_geometry.add_vertex(current_head_pos + Vector3(0, -0.8, 0))
+	debug_geometry.add_vertex(current_head_pos + Vector3(0.8, 0, 0))
+	debug_geometry.add_vertex(current_head_pos + Vector3(-0.8, 0, 0))
+	debug_geometry.add_vertex(current_head_pos + Vector3(0, 0, 0.8))
+	debug_geometry.add_vertex(current_head_pos + Vector3(0, 0, -0.8))
+	
+	debug_geometry.end()
 
 func draw_bone_axes(bone_name: String):
 	var bone_idx = $metarig/Skeleton.find_bone(bone_name)

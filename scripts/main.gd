@@ -7,15 +7,16 @@ const ESCALA = 0.05
 const RADIO = 0.1
 
 # Constantes de velocidad
-const VELOCIDAD_BASE = 1
-const VELOCIDAD_MOVIMIENTO = 1.3 * VELOCIDAD_BASE
-const VELOCIDAD_ROTACION = 0.02 * VELOCIDAD_BASE
+const VELOCIDAD_BASE = 1.2
+const VELOCIDAD_MOVIMIENTO = 1 * VELOCIDAD_BASE
+const VELOCIDAD_ROTACION = 0.04 * VELOCIDAD_BASE
 
 # Constantes de dimensiones y umbrales
-const DISTANCIA_ENTRE_PATAS = 12 * ESCALA
-const LONGITUD_PASO = 180 * ESCALA
-const UMBRAL_DISTANCIA = 120 * ESCALA
-const UMBRAL_PATAS = 85 * ESCALA
+const DISTANCIA_ENTRE_PATAS = 5 * ESCALA
+const LONGITUD_PASO = 200 * ESCALA
+const UMBRAL_DISTANCIA = 150 * ESCALA
+const UMBRAL_PATAS_FRONT = 60 * ESCALA
+const UMBRAL_PATAS_BACK = 70*ESCALA
 const ALTURA_PASO = 35* ESCALA
 
 # Opciones de debug
@@ -119,6 +120,9 @@ func manejar_movimiento_objetivo():
 		punto_objetivo.z -= velocidad_objetivo
 	if Input.is_key_pressed(KEY_D):
 		punto_objetivo.x -= velocidad_objetivo
+		
+func set_target(new_target):
+	punto_objetivo = new_target
 
 func _process(delta):
 	actualizar_maquina_estados()
@@ -130,13 +134,13 @@ func _process(delta):
 # -----------------
 func actualizar_maquina_estados():
 	# Lógica de transición de estados basada en la posición de las patas
-	if debe_avanzar() and (estado_actual == Estado.PASO_1 or estado_actual == Estado.PASO_5) and distancia(patas["frontL"], objetivos["frontL"]) < UMBRAL_PATAS/2:
+	if debe_avanzar() and (estado_actual == Estado.PASO_1 or estado_actual == Estado.PASO_5) and distancia(patas["frontL"], objetivos["frontL"]) < UMBRAL_PATAS_FRONT:
 		cambiar_estado(Estado.PASO_2)
-	elif distancia(patas["backR"], objetivos["backR"]) < UMBRAL_PATAS and estado_actual == Estado.PASO_2:
+	elif distancia(patas["backR"], objetivos["backR"]) < UMBRAL_PATAS_BACK and estado_actual == Estado.PASO_2:
 		cambiar_estado(Estado.PASO_3)
-	elif debe_avanzar() and estado_actual == Estado.PASO_3 and distancia(patas["frontR"], objetivos["frontR"]) < UMBRAL_PATAS/2:
+	elif debe_avanzar() and estado_actual == Estado.PASO_3 and distancia(patas["frontR"], objetivos["frontR"]) < UMBRAL_PATAS_FRONT:
 		cambiar_estado(Estado.PASO_4)
-	elif distancia(patas["backL"], objetivos["backL"]) < UMBRAL_PATAS and estado_actual == Estado.PASO_4:
+	elif distancia(patas["backL"], objetivos["backL"]) < UMBRAL_PATAS_BACK and estado_actual == Estado.PASO_4:
 		cambiar_estado(Estado.PASO_5)
 
 func cambiar_estado(nuevo_estado):
