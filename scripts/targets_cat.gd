@@ -14,6 +14,8 @@ onready var ik_backR = $metarig/Skeleton/ik_backR
 onready var ik_frontL = $metarig/Skeleton/ik_frontL
 onready var ik_frontR = $metarig/Skeleton/ik_frontR
 
+onready var helper = 0
+
 
 onready var hueso =  $metarig/Skeleton
 
@@ -91,10 +93,20 @@ func update_column(skeleton: Skeleton, bones: Array, target: Vector3):
 		
 		var basis = pos.basis
 		var dir = positions[i+1]-positions[i]
-		var dir_proj_zx = Vector2(dir.x, dir.z)
-		pos.basis = basis_pos[i].basis * Basis(Vector3.BACK, Vector2(0,10).angle_to(dir_proj_zx))
+		var dir_proj_zx = Vector3(dir.x, 0, dir.z)
+		var cruz = Vector3(0,0,10).cross(dir)
+		pos.basis = basis_pos[i].basis * Basis(Vector3.BACK, Vector3(0,0,10).signed_angle_to(dir_proj_zx, Vector3.DOWN))
 		
+		var vec_plane = pos.basis.x;
+		var point_plane = pos.origin;
+		var dir_proj_vec_plane = dir - dir.dot(vec_plane.normalized()) * vec_plane.normalized()
 
+		var front_proj_vec_plane = Vector3(dir_proj_vec_plane.x, 0, dir_proj_vec_plane.z)
+		
+		pos.basis *= Basis(basis_pos[i].basis.x.normalized(), -dir_proj_vec_plane.signed_angle_to(front_proj_vec_plane, pos.basis.x))
+		
+		print(helper)
+		
 		
 		skeleton.set_bone_global_pose_override(current_bone, pos, 1, true)
 
@@ -103,6 +115,15 @@ func get_target_pos():
 	var out = (patas["frontL"] + patas["frontR"])/2
 	out.y += offset_y/2
 	return out
+	
+func update_magnet_pos():
+	ik_backL.magnet = t_frontL.position;
+	ik_backR.magnet = t_frontR.position;
+	
+
+	ik_frontL.magnet = t_backL.position;
+	ik_frontR.magnet = t_backR.position;
+	
 
 
 func _ready():
@@ -116,27 +137,14 @@ func _ready():
 	ik_frontL.start()
 	ik_frontR.start()
 	
-	for name in ["spine","spine.001","spine.002","spine.003"]:
+	for name in ["spine","spine.001","spine.002","spine.003", "spine.004"]:
 		var current_bone = hueso.find_bone(name)
 		var pos = hueso.get_bone_global_pose(current_bone)
 		basis_pos.append(pos)
 		
-	
 
 func _process(_delta):
-	# Limpiar geometría anterior
-	debug_geometry.clear()
-	
-	# Empezar a dibujar
-	debug_geometry.begin(Mesh.PRIMITIVE_LINES, debug_material)
-	
-	# Dibujar ejes para cada hueso que quieras visualizar
-	var bone_names = ["spine", "spine.001", "spine.002", "spine.003"]
-	for bone_name in bone_names:
-		draw_bone_axes(bone_name)
-	
-	# Terminar de dibujar
-	debug_geometry.end()
+
 	
 	if not objetivo:
 		return
@@ -146,9 +154,20 @@ func _process(_delta):
 	if Input.is_key_pressed(KEY_O):
 		offset_y -= 0.1
 	
+	if Input.is_key_pressed(KEY_R):
+		helper += 0.1
+	if Input.is_key_pressed(KEY_T):
+		helper -= 0.1
+	
 		
+		# Limpiar geometría anterior
+	debug_geometry.clear()
 	update_targets_pos()
-	update_column(hueso, ["spine","spine.001","spine.002","spine.003"], get_target_pos())
+	update_column(hueso, ["spine","spine.001","spine.002","spine.003","spine.004"], get_target_pos())
+	update_magnet_pos()
+	
+	
+	# Empezar a d
 
 func draw_bone_axes(bone_name: String):
 	var bone_idx = $metarig/Skeleton.find_bone(bone_name)
@@ -162,12 +181,12 @@ func draw_bone_axes(bone_name: String):
 	# Dibujar eje X (rojo)
 	debug_geometry.set_color(Color.red)
 	debug_geometry.add_vertex(origin)
-	debug_geometry.add_vertex(origin + transform.basis.x * scale)
+	debug_geometry.add_vertex(origin + transform.basis.x * scale*5)
 	
 	# Dibujar eje Y (verde)
 	debug_geometry.set_color(Color.green)
 	debug_geometry.add_vertex(origin)
-	debug_geometry.add_vertex(origin + transform.basis.y * scale)
+	debug_geometry.add_vertex(origin + transform.basis.y * scale*100)
 	
 	# Dibujar eje Z (azul)
 	debug_geometry.set_color(Color.blue)

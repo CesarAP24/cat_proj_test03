@@ -15,24 +15,28 @@ material/0 = ExtResource( 2 )
 process_priority = 1
 root_bone = "thigh.L"
 tip_bone = "r_toe.L"
+use_magnet = true
 target_node = NodePath("../../t_backL")
 
 [node name="ik_backR" type="SkeletonIK" parent="metarig/Skeleton" index="2"]
 process_priority = 1
 root_bone = "thigh.R"
 tip_bone = "r_toe.R"
+use_magnet = true
 target_node = NodePath("../../t_backR")
 
 [node name="ik_frontL" type="SkeletonIK" parent="metarig/Skeleton" index="3"]
 process_priority = 1
 root_bone = "shoulder.L"
 tip_bone = "f_toe.L"
+use_magnet = true
 target_node = NodePath("../../t_frontL")
 
 [node name="ik_frontR" type="SkeletonIK" parent="metarig/Skeleton" index="4"]
 process_priority = 1
 root_bone = "shoulder.R"
 tip_bone = "f_toe.R"
+use_magnet = true
 target_node = NodePath("../../t_frontR")
 
 [node name="t_backL" type="Position3D" parent="metarig" index="1"]
