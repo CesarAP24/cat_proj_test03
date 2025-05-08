@@ -10,12 +10,15 @@ extends Node3D
 @onready var t_frontL = $metarig/t_frontL
 @onready var t_frontR = $metarig/t_frontR
 @onready var ik_backL = $metarig/Skeleton3D/ik_backL
+@onready var ik_backL2 = $metarig/Skeleton3D/ik_backL2
 @onready var ik_backR = $metarig/Skeleton3D/ik_backR
+@onready var ik_backR2 = $metarig/Skeleton3D/ik_backR2
 @onready var ik_frontL = $metarig/Skeleton3D/ik_frontL
 @onready var ik_frontR = $metarig/Skeleton3D/ik_frontR
 @export var spring_stiffness: float = 250.0  # Controls how strongly the spring pulls
 @export var spring_damping: float = 15  # Controls how quickly oscillations settle
 @export var mass: float = 1.0             # Simulated mass of the head
+var column_bones = ["spine","spine.001","spine.002","spine.003"]
 
 @onready var helper = 0
 
@@ -133,9 +136,15 @@ func get_target_pos():
 	
 func update_magnet_pos():
 	ik_backL.magnet = t_frontL.position;
-	ik_backR.magnet = t_frontR.position;
+	var vec = t_frontL.position - t_backL.position
+	vec = vec.normalized()
+	ik_backL2.magnet = t_backL.position - vec*100;
 	
-
+	ik_backR.magnet = t_frontR.position;
+	vec = t_frontR.position - t_backR.position
+	vec = vec.normalized()
+	ik_backR2.magnet = t_backR.position - vec*100;
+	
 	ik_frontL.magnet = t_backL.position;
 	ik_frontR.magnet = t_backR.position;
 	
@@ -145,8 +154,10 @@ func _ready():
 	ik_backR.start()
 	ik_frontL.start()
 	ik_frontR.start()
+	ik_backL2.start()
+	ik_backR2.start()
 	
-	for name in ["spine","spine.001","spine.002","spine.003", "spine.004"]:
+	for name in column_bones:
 		var current_bone = hueso.find_bone(name)
 		var pos = hueso.get_bone_global_pose(current_bone)
 		basis_pos.append(pos)
@@ -185,6 +196,6 @@ func _process(delta):
 		
 	# Limpiar geometría anterior
 	update_targets_pos()
-	update_column(hueso, ["spine","spine.001","spine.002","spine.003","spine.004"], get_target_pos(), delta)
+	update_column(hueso, column_bones, get_target_pos(), delta)
 	update_magnet_pos()
 	

@@ -13,21 +13,35 @@ tip_bone = &"r_toe.L"
 use_magnet = true
 target_node = NodePath("../../t_backL")
 
-[node name="ik_backR" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="2"]
+[node name="ik_backL2" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="2"]
+process_priority = 1
+root_bone = &"shin.L"
+tip_bone = &"r_toe.L"
+use_magnet = true
+target_node = NodePath("../../t_backL")
+
+[node name="ik_backR" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="3"]
 process_priority = 1
 root_bone = &"thigh.R"
 tip_bone = &"r_toe.R"
 use_magnet = true
 target_node = NodePath("../../t_backR")
 
-[node name="ik_frontL" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="3"]
+[node name="ik_backR2" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="4"]
+process_priority = 1
+root_bone = &"shin.R"
+tip_bone = &"r_toe.R"
+use_magnet = true
+target_node = NodePath("../../t_backR")
+
+[node name="ik_frontL" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="5"]
 process_priority = 1
 root_bone = &"shoulder.L"
 tip_bone = &"f_toe.L"
 use_magnet = true
 target_node = NodePath("../../t_frontL")
 
-[node name="ik_frontR" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="4"]
+[node name="ik_frontR" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="6"]
 process_priority = 1
 root_bone = &"shoulder.R"
 tip_bone = &"f_toe.R"

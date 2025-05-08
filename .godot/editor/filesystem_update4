@@ -1,6 +1,9 @@
 res://default_env.tres
+res://scenes/cat_model.tscn
 res://scenes/test03.tscn
 res://scripts/main.gd
 res://scripts/Camera.gd
 res://scripts/targets_cat.gd
-res://scenes/cat_model.tscn
+res://scripts/salsa_dancing.tscn
+res://messirve.gd
+res://scenes/salsa_dancing.tscn
