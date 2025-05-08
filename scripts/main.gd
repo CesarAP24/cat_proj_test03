@@ -16,15 +16,19 @@ const RADIO = 1
 @export var UMBRAL_PATAS_BACK = 100 * ESCALA
 @export var ALTURA_PASO = 60 * ESCALA
 @export var RANDOM_DISTANCE = 0.0
-@export var MIN_HEIGHT_JUMP = 100 * ESCALA
+@export var MIN_HEIGHT_JUMP = 120 * ESCALA
+@export var MAX_HEIGHT_JUMP = 120 * 5 * ESCALA
 @export var UMBRAL_DETECCION_SALTO = 270 * ESCALA
 @export var MARGEN_SALTO_ADELANTE = 30 * ESCALA
-@export var MOVEMENT_TARGET_SPEED = 2
-@export var DEBUG = false	
+@export var MOVEMENT_TARGET_SPEED = 0.85
+@export var DEBUG = false
+
+@export var camara_path: NodePath
+var camara: Camera3D
 
 # Variables de control para velocidades de salto
-@export var VELOCIDAD_PREPARACION_SALTO = 0.7  # Velocidad durante la preparación (más baja = más lento)
-@export var VELOCIDAD_EJECUCION_SALTO = 0.75    # Velocidad durante el salto (más baja = más lento)
+@export var VELOCIDAD_PREPARACION_SALTO = 1.5  # Velocidad durante la preparación (más baja = más lento)
+@export var VELOCIDAD_EJECUCION_SALTO = 0.5   # Velocidad durante el salto (más baja = más lento)
 @export var VELOCIDAD_ATERRIZAJE = 0.7         # Velocidad durante el aterrizaje (más baja = más lento)
 
 # Estados del movimiento
@@ -37,6 +41,7 @@ var punto_objetivo = Vector3(0, 0, 0)
 var tiempo = 0
 var en_ciclo_salto = false
 var posicion_obstaculo = Vector3()
+var salto_es_bajada = false
 
 # Diccionarios para tracking
 var objetivos = {}
@@ -49,6 +54,34 @@ var progreso_movimiento = {}
 func _ready():
 	VELOCIDAD_BASE = VELOCIDAD_BASE_INICIAL
 	inicializar()
+	if camara_path:
+		camara = get_node(camara_path)
+
+func obtener_direccion_camara():
+	if not camara:
+		return direccion
+	
+	# Obtener la orientación de la cámara (ignorando componente Y)
+	var orientacion_camara = -camara.global_transform.basis.z
+	orientacion_camara.y = 0
+	orientacion_camara = orientacion_camara.normalized()
+	
+	# Obtener vector derecha de la cámara (ignorando componente Y)
+	var derecha_camara = camara.global_transform.basis.x
+	derecha_camara.y = 0
+	derecha_camara = derecha_camara.normalized()
+	
+	# Convertir entrada de teclado a dirección relativa a la cámara
+	var input_dir = Vector3.ZERO
+	
+	if Input.is_key_pressed(KEY_W): input_dir += orientacion_camara
+	if Input.is_key_pressed(KEY_S): input_dir -= orientacion_camara
+	if Input.is_key_pressed(KEY_D): input_dir -= derecha_camara
+	if Input.is_key_pressed(KEY_A): input_dir += derecha_camara
+	
+	if input_dir.length() > 0.1:
+		return input_dir.normalized()
+	return direccion
 
 # Configura las posiciones iniciales de las patas
 func inicializar():
@@ -105,25 +138,37 @@ func crear_material(color):
 	mat.albedo_color = color
 	return mat
 
-# Maneja entrada para mover el objetivo
+
 func manejar_movimiento_objetivo():
 	var velocidad_objetivo = 0.2 * 2 * MOVEMENT_TARGET_SPEED
+	
+	if camara:
+		var input_dir = Vector3.ZERO
+		var orientacion_camara = -camara.global_transform.basis.z
+		orientacion_camara.y = 0
+		orientacion_camara = orientacion_camara.normalized()
+		
+		var derecha_camara = camara.global_transform.basis.x
+		derecha_camara.y = 0
+		derecha_camara = derecha_camara.normalized()
+		
+		if Input.is_key_pressed(KEY_W): input_dir += orientacion_camara
+		if Input.is_key_pressed(KEY_S): input_dir -= orientacion_camara
+		if Input.is_key_pressed(KEY_D): input_dir += derecha_camara
+		if Input.is_key_pressed(KEY_A): input_dir -= derecha_camara
+		
+		if input_dir.length() > 0.1:
+			punto_objetivo += input_dir * velocidad_objetivo
+	else:
+		
+		if Input.is_key_pressed(KEY_W): punto_objetivo.z += velocidad_objetivo
+		if Input.is_key_pressed(KEY_A): punto_objetivo.x += velocidad_objetivo
+		if Input.is_key_pressed(KEY_S): punto_objetivo.z -= velocidad_objetivo
+		if Input.is_key_pressed(KEY_D): punto_objetivo.x -= velocidad_objetivo
+	
+	
 	punto_objetivo.y = obtener_centro().y + 3
 	
-	if Input.is_key_pressed(KEY_W): punto_objetivo.z += velocidad_objetivo
-	if Input.is_key_pressed(KEY_A): punto_objetivo.x += velocidad_objetivo
-	if Input.is_key_pressed(KEY_S): punto_objetivo.z -= velocidad_objetivo
-	if Input.is_key_pressed(KEY_D): punto_objetivo.x -= velocidad_objetivo
-	if Input.is_key_pressed(KEY_U): VELOCIDAD_BASE += 0.01
-	if Input.is_key_pressed(KEY_J): VELOCIDAD_BASE -= 0.01
-	
-	# Controles para las velocidades de salto
-	if Input.is_key_pressed(KEY_1): VELOCIDAD_PREPARACION_SALTO = max(0.1, VELOCIDAD_PREPARACION_SALTO - 0.01)
-	if Input.is_key_pressed(KEY_2): VELOCIDAD_PREPARACION_SALTO = min(1.0, VELOCIDAD_PREPARACION_SALTO + 0.01)
-	if Input.is_key_pressed(KEY_3): VELOCIDAD_EJECUCION_SALTO = max(0.1, VELOCIDAD_EJECUCION_SALTO - 0.01)
-	if Input.is_key_pressed(KEY_4): VELOCIDAD_EJECUCION_SALTO = min(1.0, VELOCIDAD_EJECUCION_SALTO + 0.01)
-	if Input.is_key_pressed(KEY_5): VELOCIDAD_ATERRIZAJE = max(0.1, VELOCIDAD_ATERRIZAJE - 0.01)
-	if Input.is_key_pressed(KEY_6): VELOCIDAD_ATERRIZAJE = min(1.0, VELOCIDAD_ATERRIZAJE + 0.01)
 
 # Establece un objetivo externo
 func set_target(new_target):
@@ -148,6 +193,7 @@ func actualizar_maquina_estados():
 	if en_ciclo_salto:
 		match estado_actual:
 			Estado.SALTO_PREP:
+				salto_es_bajada = posicion_obstaculo.y < obtener_centro().y
 				if todas_patas_en_posicion(): cambiar_estado(Estado.SALTO)
 			Estado.SALTO:
 				if patas_delanteras_en_objetivo(): cambiar_estado(Estado.ATERRIZAJE)
@@ -204,9 +250,9 @@ func cambiar_estado(nuevo_estado):
 			
 		Estado.SALTO_PREP:
 			# Preparar patas para el salto
-			var pos_frontL = centro + dir_norm * (LONGITUD_PASO * 0.2)
+			var pos_frontL = centro + dir_norm * (LONGITUD_PASO * 0.5)
 			var pos_frontR = Vector3(pos_frontL)
-			var pos_backL = centro - dir_norm * (LONGITUD_PASO * 0.2)
+			var pos_backL = Vector3(pos_frontL)
 			var pos_backR = Vector3(pos_backL)
 						
 			# Ajustar posiciones lateralmente
@@ -230,10 +276,22 @@ func cambiar_estado(nuevo_estado):
 				progreso_movimiento[pata] = 0.0
 		
 		Estado.SALTO:
-			# Mover patas delanteras al borde del obstáculo
+			# Determinar si es subida o bajada
+			var es_bajada = posicion_obstaculo.y < obtener_centro().y
 			var borde_obstaculo = encontrar_borde_obstaculo()
-			var pos_frontL = borde_obstaculo + dir_norm * MARGEN_SALTO_ADELANTE
-			var pos_frontR = Vector3(pos_frontL)
+			
+			# Posicionar las patas delanteras
+			var pos_frontL
+			var pos_frontR
+			
+			if es_bajada:
+				# Para bajadas, colocar las patas más allá del borde
+				pos_frontL = borde_obstaculo + dir_norm * (LONGITUD_PASO * 1.8)
+				pos_frontR = Vector3(pos_frontL)
+			else:
+				# Para subidas
+				pos_frontL = borde_obstaculo + dir_norm * MARGEN_SALTO_ADELANTE
+				pos_frontR = Vector3(pos_frontL)
 			
 			# Ajustar posiciones lateralmente
 			pos_frontL += Vector3(direccion.z, 0, -direccion.x) * (DISTANCIA_ENTRE_PATAS * 0.5)
@@ -266,15 +324,21 @@ func es_necesario_saltar():
 	var centro = obtener_centro()
 	var dir_norm = direccion.normalized()
 	
-	for dist in range(1, 15):
-		var distancia_actual = UMBRAL_DETECCION_SALTO * dist / 15.0
+	for dist in range(1, 30):
+		var distancia_actual = UMBRAL_DETECCION_SALTO * dist / 30.0
 		var punto_check = centro + dir_norm * distancia_actual
 		punto_check.y = centro.y
 		
 		var altura_terreno = obtener_punto_mas_alto(punto_check.x, punto_check.z, "suelo").y
 		var diferencia_altura = altura_terreno - centro.y
 		
-		if diferencia_altura > MIN_HEIGHT_JUMP && diferencia_altura < MIN_HEIGHT_JUMP * 3:
+		# Detectar subidas (como antes)
+		if diferencia_altura > MIN_HEIGHT_JUMP && diferencia_altura < MAX_HEIGHT_JUMP:
+			posicion_obstaculo = Vector3(punto_check.x, altura_terreno, punto_check.z)
+			return true
+			
+		# NUEVO: Detectar bajadas
+		if diferencia_altura < -MIN_HEIGHT_JUMP && diferencia_altura > -MAX_HEIGHT_JUMP * 2 && dist < 10:
 			posicion_obstaculo = Vector3(punto_check.x, altura_terreno, punto_check.z)
 			return true
 	
@@ -284,32 +348,52 @@ func es_necesario_saltar():
 func encontrar_borde_obstaculo():
 	var centro = obtener_centro()
 	var dir_norm = direccion.normalized()
+	var es_bajada = false
 	
 	if posicion_obstaculo == Vector3():
 		for dist in range(1, 30):
 			var distancia_actual = UMBRAL_DETECCION_SALTO * dist / 30.0
 			var punto_check = centro + dir_norm * distancia_actual
 			var altura_terreno = obtener_punto_mas_alto(punto_check.x, punto_check.z, "suelo").y
+			var diferencia_altura = altura_terreno - centro.y
 			
-			if altura_terreno - centro.y > MIN_HEIGHT_JUMP:
+			# Verificar si estamos ante una subida o bajada
+			if diferencia_altura > MIN_HEIGHT_JUMP:
 				posicion_obstaculo = Vector3(punto_check.x, altura_terreno, punto_check.z)
+				es_bajada = false
 				break
+			elif diferencia_altura < -MIN_HEIGHT_JUMP:
+				posicion_obstaculo = Vector3(punto_check.x, altura_terreno, punto_check.z)
+				es_bajada = true
+				break
+	else:
+		# Determinar si la posición del obstáculo es una bajada
+		es_bajada = posicion_obstaculo.y < centro.y
 	
-	# Búsqueda binaria para el borde
+	# Búsqueda binaria del borde
 	var ultimo_punto_bajo = centro
 	var primer_punto_alto = posicion_obstaculo
 	
 	for _i in range(10):
 		var punto_medio = (ultimo_punto_bajo + primer_punto_alto) / 2
 		var altura_medio = obtener_punto_mas_alto(punto_medio.x, punto_medio.z, "suelo").y
+		var diferencia_altura = altura_medio - centro.y
 		
-		if altura_medio - centro.y > MIN_HEIGHT_JUMP * 0.5:
-			primer_punto_alto = punto_medio
+		if es_bajada:
+			# Para bajadas buscamos el borde donde comienza la caída
+			if diferencia_altura < -MIN_HEIGHT_JUMP * 0.5:
+				primer_punto_alto = punto_medio
+			else:
+				ultimo_punto_bajo = punto_medio
 		else:
-			ultimo_punto_bajo = punto_medio
+			# Para subidas (como antes)
+			if diferencia_altura > MIN_HEIGHT_JUMP * 0.5:
+				primer_punto_alto = punto_medio
+			else:
+				ultimo_punto_bajo = punto_medio
 	
 	var borde = ultimo_punto_bajo
-	borde.y = obtener_punto_mas_alto(primer_punto_alto.x, primer_punto_alto.z, "suelo").y
+	borde.y = obtener_punto_mas_alto(borde.x, borde.z, "suelo").y
 	
 	return borde
 
@@ -329,8 +413,6 @@ func patas_traseras_en_objetivo():
 # Función para suavizar el movimiento
 func obtener_progreso_suave(x):
 	return 1 / (1 + exp(-8 * (x - 0.5)))
-# Añade esta variable a la sección de parámetros exportables
-@export var VELOCIDAD_CAIDA = 2.0  # Velocidad a la que las patas caen en bajadas
 
 # Modifica la función mover_patas() para manejar mejor las bajadas
 func mover_patas(delta):
@@ -350,17 +432,17 @@ func mover_patas(delta):
 			
 			# Aumentar la velocidad si es una bajada
 			var diferencia_altura = objetivos[nombre].y - patas[nombre].y
-			if diferencia_altura < -ALTURA_PASO * 0.5:  # Si es una bajada significativa
-				velocidad_actual = max(velocidad_actual, VELOCIDAD_CAIDA)
 			
 			progreso_movimiento[nombre] += velocidad_actual * delta * 5
 			progreso_movimiento[nombre] = min(progreso_movimiento[nombre], 1.0)
 			
 			var factor_altura = 1.0
-			if estado_actual == Estado.SALTO && (nombre == "frontL" || nombre == "frontR"):
-				factor_altura = 2.0
-			elif estado_actual == Estado.ATERRIZAJE && (nombre == "backL" || nombre == "backR"):
-				factor_altura = 1.2
+			if estado_actual == Estado.SALTO:
+				if nombre == "frontL" || nombre == "frontR":
+					factor_altura = 0.5 if salto_es_bajada else 2.0
+			elif estado_actual == Estado.ATERRIZAJE:
+				if nombre == "backL" || nombre == "backR":
+					factor_altura =  0.5 if salto_es_bajada else 1.2
 			
 			patas[nombre] = calcular_posicion_interpolada(
 				posiciones_iniciales[nombre], 
@@ -369,12 +451,6 @@ func mover_patas(delta):
 				factor_altura
 			)
 			
-			# Ajuste adicional para bajadas: atraer patas hacia el suelo
-			if diferencia_altura < -ALTURA_PASO * 0.5:
-				var altura_suelo = obtener_punto_mas_alto(patas[nombre].x, patas[nombre].z, "suelo").y
-				if patas[nombre].y > altura_suelo:
-					patas[nombre].y = lerp(patas[nombre].y, altura_suelo, delta * VELOCIDAD_CAIDA)
-	
 	if debe_avanzar() and not en_ciclo_salto:
 		var dist = distancia(obtener_centro(), punto_objetivo)
 		var factor_velocidad = 2/(0.2*dist)
@@ -390,7 +466,16 @@ func calcular_posicion_interpolada(pos_inicial, pos_final, progreso, factor_altu
 func calcular_altura_parabola(pos_inicial, pos_final, progreso, factor_altura = 1.0):
 	var y_inicio = pos_inicial.y
 	var y_fin = pos_final.y
-	var altura_maxima = max(y_inicio, y_fin) + (ALTURA_PASO * factor_altura)
+	var es_bajada = y_fin < y_inicio - ALTURA_PASO
+	
+	# Altura máxima diferente para subidas y bajadas
+	var altura_maxima
+	if es_bajada:
+		# Para bajadas, la parábola no sube tanto
+		altura_maxima = y_inicio + (ALTURA_PASO * factor_altura * 0.5)
+	else:
+		# Para subidas o plano (como antes)
+		altura_maxima = max(y_inicio, y_fin) + (ALTURA_PASO * factor_altura)
 	
 	var a = y_inicio + y_fin - 2 * altura_maxima
 	var b = -2 * y_inicio + 2 * altura_maxima

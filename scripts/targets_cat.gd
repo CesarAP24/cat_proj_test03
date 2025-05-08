@@ -179,20 +179,6 @@ func _process(delta):
 		helper += 0.1
 	if Input.is_key_pressed(KEY_T):
 		helper -= 0.1
-	
-	# Add these controls for spring parameters
-	if Input.is_key_pressed(KEY_U):
-		spring_stiffness += 0.1
-		print("Spring stiffness: ", spring_stiffness)
-	if Input.is_key_pressed(KEY_J):
-		spring_stiffness = max(0.1, spring_stiffness - 0.1)
-		print("Spring stiffness: ", spring_stiffness)
-	if Input.is_key_pressed(KEY_I):
-		spring_damping += 0.1
-		print("Spring damping: ", spring_damping)
-	if Input.is_key_pressed(KEY_K):
-		spring_damping = max(0.1, spring_damping - 0.1)
-		print("Spring damping: ", spring_damping)
 		
 	# Limpiar geometría anterior
 	update_targets_pos()

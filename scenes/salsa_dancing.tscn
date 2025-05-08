@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://cw6xnniivw4rx"]
+[gd_scene load_steps=4 format=3 uid="uid://cw6xnniivw4rx"]
 
 [ext_resource type="PackedScene" uid="uid://bi4n48jgmejf0" path="res://scenes/Salsa Dancing.fbx" id="1_bw2tq"]
 [ext_resource type="Script" uid="uid://bacj52yh77rtk" path="res://messirve.gd" id="2_a8mif"]
+[ext_resource type="AudioStream" uid="uid://dt6r5v4hlfmv6" path="res://musica/MEHACESFALTA.mp3" id="3_uperc"]
 
 [node name="Salsa Dancing" instance=ExtResource("1_bw2tq")]
 
@@ -38,3 +39,11 @@ bones/31/rotation = Quaternion(0.422235, 0.163337, -0.0498753, 0.890253)
 
 [node name="AnimationPlayer" parent="." index="1"]
 script = ExtResource("2_a8mif")
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." index="2"]
+stream = ExtResource("3_uperc")
+volume_db = 80.0
+unit_size = 42.44
+max_db = 6.0
+autoplay = true
+max_distance = 150.0
