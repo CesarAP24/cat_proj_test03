@@ -16,7 +16,6 @@ sky = SubResource("6")
 ambient_light_color = Color(1, 1, 1, 1)
 ambient_light_energy = 0.0
 fog_enabled = true
-fog_density = 0.001
 volumetric_fog_enabled = true
 volumetric_fog_density = 0.02
 
@@ -57,8 +56,8 @@ invertir_x = true
 [node name="cat_model" parent="." instance=ExtResource("3_4rhi5")]
 objetivo_path = NodePath("..")
 offset_y = 7.0
-spring_damping = 35.0
-mass = 1.5
+spring_stiffness = 400.0
+spring_damping = 30.0
 
 [node name="Node3D" type="Node3D" parent="."]
 transform = Transform3D(0.386736, 0, 0, 0, 0.330699, 0, 0, 0, 0.450555, 0, 0, 0)

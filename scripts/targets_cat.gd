@@ -19,6 +19,7 @@ extends Node3D
 @export var spring_damping: float = 15  # Controls how quickly oscillations settle
 @export var mass: float = 1.0             # Simulated mass of the head
 var column_bones = ["spine","spine.001","spine.002","spine.003"]
+var foot_bones = ["f_toe.R", "f_toe.L"]
 
 @onready var helper = 0
 
@@ -164,7 +165,13 @@ func _ready():
 		
 	current_head_pos = get_target_pos()
 
-		
+func rotate_children(rotation: Vector3):
+	$metarig/t_backL.rotate(Vector3(0, 1, 0), rotation.y)
+	$metarig/t_backL.rotate(Vector3(1, 0, 0), rotation.x)
+	
+
+var rotation_speed : float = 5.0  # Velocidad de rotación en grados por segundo
+
 
 func _process(delta):
 	if not objetivo:
@@ -185,3 +192,11 @@ func _process(delta):
 	update_column(hueso, column_bones, get_target_pos(), delta)
 	update_magnet_pos()
 	
+	if Input.is_key_pressed(KEY_F):
+		rotate_children(Vector3(0, -rotation_speed * delta, 0))  # Rotar hacia la izquierda (Y negativo)
+	elif Input.is_key_pressed(KEY_G):
+		rotate_children(Vector3(0, rotation_speed * delta, 0))   # Rotar hacia la derecha (Y positivo)
+	elif Input.is_key_pressed(KEY_H):
+		rotate_children(Vector3(rotation_speed * delta, 0, 0))   # Rotar hacia arriba (X positivo)
+	elif Input.is_key_pressed(KEY_J):
+		rotate_children(Vector3(-rotation_speed * delta, 0, 0))  # Rotar hacia abajo (X negativo)

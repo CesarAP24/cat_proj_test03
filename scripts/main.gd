@@ -7,12 +7,12 @@ const RADIO = 1
 # Parámetros exportables
 @export var VELOCIDAD_BASE_INICIAL = 1.2
 @export var VELOCIDAD_BASE = VELOCIDAD_BASE_INICIAL
-@export var VELOCIDAD_MOVIMIENTO = 0.9
-@export var VELOCIDAD_ROTACION = 0.04
+@export var VELOCIDAD_MOVIMIENTO = 0.8
+@export var VELOCIDAD_ROTACION = 0.1
 @export var DISTANCIA_ENTRE_PATAS = 12 * ESCALA
-@export var LONGITUD_PASO = 180 * ESCALA
-@export var UMBRAL_DISTANCIA = 150 * ESCALA    
-@export var UMBRAL_PATAS_FRONT = 70 * ESCALA
+@export var LONGITUD_PASO = 210 * ESCALA
+@export var UMBRAL_DISTANCIA = 200 * ESCALA    
+@export var UMBRAL_PATAS_FRONT = 150 * ESCALA
 @export var UMBRAL_PATAS_BACK = 100 * ESCALA
 @export var ALTURA_PASO = 60 * ESCALA
 @export var RANDOM_DISTANCE = 0.0

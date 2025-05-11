@@ -1,17 +1,18 @@
 ea4bc82a6ad023ab7ee23ee620429895
-::res://::1746691623
-default_env.tres::Environment::575452778615666432::1746691623::0::1::::<><><>0<>0<><>::
+::res://::1746804011
+default_env.tres::Environment::575452778615666432::1746759290::0::1::::<><><>0<>0<><>::
 export_presets.cfg::TextFile/TextFile::-1::1746658353::0::1::::<><><>0<>0<><>::
 icon.png::CompressedTexture2D/CompressedTexture2D::7669357960292152521::1746423755::1746570445::1::::<><><>0<>0<>a98f5bcec8f08899120db9d7db6b9319<>res://.godot/imported/icon.png-487276ed1e3a0c39cad0279d744ee560.ctex::
 messirve.gd::GDScript/GDScript::2391150921521114292::1746689326::0::1::::<>AnimationPlayer<><>0<>0<><>::
+test03.tscn::PackedScene::3714901445724690630::1746759290::0::1::::<><><>0<>0<><>::uid://c0kae6f0h1cyc::::res://scripts/main.gd<>uid://di8sk7kmiq0wr::::res://scripts/audio_listener_3d.gd<>uid://cyykjr8fvts8h::::res://scripts/Camera.gd<>uid://b8hniu3f6w3v0::::res://scenes/cat_model.tscn<>uid://cw6xnniivw4rx::::res://scenes/salsa_dancing.tscn
 ::res://materials/::1746564863
 Material_001.material::StandardMaterial3D/StandardMaterial3D::-1::1746564863::0::1::::<><><>0<>0<><>::
 Material_81.material::StandardMaterial3D/StandardMaterial3D::-1::1746564863::0::1::::<><><>0<>0<><>::
 Material_93.material::StandardMaterial3D/StandardMaterial3D::-1::1746564863::0::1::::<><><>0<>0<><>::
 Material_105.material::StandardMaterial3D/StandardMaterial3D::-1::1746564863::0::1::::<><><>0<>0<><>::
 ::res://musica/::1746691586
-MEHACESFALTA.mp3::AudioStreamMP3::8557932701394588177::1746691556::1746691586::1::::<><><>0<>0<>0f19aab2a7ef9ac41b2fb0e52d25cf08<>res://.godot/imported/MEHACESFALTA.mp3-cbbc08060bedd900b9da9a35625bd7d1.mp3str::
-::res://scenes/::1746691623
+MEHACESFALTA.mp3::AudioStreamMP3/AudioStreamMP3::8557932701394588177::1746691556::1746691586::1::::<><><>0<>0<>0f19aab2a7ef9ac41b2fb0e52d25cf08<>res://.godot/imported/MEHACESFALTA.mp3-cbbc08060bedd900b9da9a35625bd7d1.mp3str::
+::res://scenes/::1746759290
 casur_cat.glb::PackedScene/PackedScene::3169380986272630573::1746564863::1746570445::1::::<><><>0<>0<>8860c16f0c0ffd9611044ced9f5bd467<>res://.godot/imported/casur_cat.glb-b11baf20090687000f103a753534b00d.scn::uid://bwe25w7puyhxc::::res://scenes/casur_cat_textura.jpg
 casur_cat_textura.jpg::CompressedTexture2D/CompressedTexture2D::3940526893024548748::1746570445::1746570450::1::::<><><>0<>0<>1c3398c1ac45f14655fdbe7eef926de3<>res://.godot/imported/casur_cat_textura.jpg-57bb60cabd897320073a8336e60da411.s3tc.ctex::
 cat2.glb::PackedScene/PackedScene::2084029842757335219::1746564863::1746570449::1::::<><><>0<>0<>0c729c5c58292da134bc8a86f8df15ba<>res://.godot/imported/cat2.glb-695fd43a0b1620113138c79ff8e5ca65.scn::uid://d1nh7cnhpm6dw::::res://scenes/cat2_Material_105_baseColor.png<>uid://c33fhve5f1r0u::::res://scenes/cat2_Material_81_baseColor.png<>uid://d02ycnprfewlp::::res://scenes/cat2_Material_93_baseColor.png
@@ -19,7 +20,7 @@ cat2_Material_81_baseColor.png::CompressedTexture2D/CompressedTexture2D::6796248
 cat2_Material_93_baseColor.png::CompressedTexture2D/CompressedTexture2D::8971182827558816685::1746570449::1746570450::1::::<><><>0<>0<>ef40449953ae0dd6488a44fbd63c55b5<>res://.godot/imported/cat2_Material_93_baseColor.png-005699f41a042ea59d6adc61da867b35.s3tc.ctex::
 cat2_Material_105_baseColor.png::CompressedTexture2D/CompressedTexture2D::9011491186293002472::1746570445::1746570450::1::::<><><>0<>0<>0a3d2d9077bfa782e159bc7751e26980<>res://.godot/imported/cat2_Material_105_baseColor.png-3cbb149702c4ca1f1eea12f450caf534.s3tc.ctex::
 cattest1.tscn::PackedScene/PackedScene::-1::1746570426::0::1::::<><><>0<>0<><>::res://scenes/cat2.glb<>res://scripts/targets_cat.gd
-cat_model.tscn::PackedScene::4717907869274819219::1746691623::0::1::::<><><>0<>0<><>::uid://blfjihrm0y4ub::::res://scenes/casur_cat.glb<>uid://jcoxxws3n8i1::::res://scripts/targets_cat.gd
+cat_model.tscn::PackedScene::4717907869274819219::1746759290::0::1::::<><><>0<>0<><>::uid://blfjihrm0y4ub::::res://scenes/casur_cat.glb<>uid://jcoxxws3n8i1::::res://scripts/targets_cat.gd
 Material_001.material::StandardMaterial3D/StandardMaterial3D::-1::1746564863::0::1::::<><><>0<>0<><>::
 Salsa Dancing.fbx::PackedScene/PackedScene::3008641244056910535::1746687659::1746687667::1::::<><><>0<>0<>c929fe57fedf0deaef1aa13a065b4c6e<>res://.godot/imported/Salsa Dancing.fbx-f498bc0b8e90f99939fd07e288f49cba.scn::uid://bnm2fp3gowd4a::::res://scenes/Salsa Dancing_0.png<>uid://jf41ydcui8gx::::res://scenes/Salsa Dancing_1.png<>uid://dlytvetvvxxgm::::res://scenes/Salsa Dancing_2.png<>uid://cqumv44qohqel::::res://scenes/Salsa Dancing_3.png<>uid://3b6ni6tht0qp::::res://scenes/Salsa Dancing_4.png<>uid://yk0mukfcqu0u::::res://scenes/Salsa Dancing_5.png<>uid://bt4ksl5yqb7j2::::res://scenes/Salsa Dancing_6.png<>uid://c3nayxdtb0bhw::::res://scenes/Salsa Dancing_7.png<>uid://c0t22bc3xbnl8::::res://scenes/Salsa Dancing_8.png
 Salsa Dancing_0.png::CompressedTexture2D/CompressedTexture2D::3325297303207424566::1746687660::1746687669::1::::<><><>0<>0<>5f4560d0df4f04cf244ccabfc20ae830<>res://.godot/imported/Salsa Dancing_0.png-704f63537a61c77afd801f26c4713291.s3tc.ctex::
@@ -31,9 +32,9 @@ Salsa Dancing_5.png::CompressedTexture2D/CompressedTexture2D::170671644534494501
 Salsa Dancing_6.png::CompressedTexture2D/CompressedTexture2D::3780515607114294869::1746687665::1746687669::1::::<><><>0<>0<>059f2dd02af63cbbb672f6b4d0d73520<>res://.godot/imported/Salsa Dancing_6.png-47cc6eab191fcc38f103bca17097f3ae.s3tc.ctex::
 Salsa Dancing_7.png::CompressedTexture2D/CompressedTexture2D::6765009972644663424::1746687665::1746687669::1::::<><><>0<>0<>0fa238bc657385632e10820a651093fc<>res://.godot/imported/Salsa Dancing_7.png-3bbbfe1219348ee295a7f42b0b646724.s3tc.ctex::
 Salsa Dancing_8.png::CompressedTexture2D/CompressedTexture2D::6568473267820215491::1746687665::1746687669::1::::<><><>0<>0<>3df91141499a36136157dda37251c495<>res://.godot/imported/Salsa Dancing_8.png-329fad90cbf992164388e960b912341c.s3tc.ctex::
-salsa_dancing.tscn::PackedScene::6382412039507592397::1746691623::0::1::::<><><>0<>0<><>::uid://bi4n48jgmejf0::::res://scenes/Salsa Dancing.fbx<>uid://bacj52yh77rtk::::res://messirve.gd<>uid://dt6r5v4hlfmv6::::res://musica/MEHACESFALTA.mp3
-test03.tscn::PackedScene::3714901445724690630::1746691623::0::1::::<><><>0<>0<><>::uid://c0kae6f0h1cyc::::res://scripts/main.gd<>uid://cyykjr8fvts8h::::res://scripts/Camera.gd<>uid://b8hniu3f6w3v0::::res://scenes/cat_model.tscn<>uid://cw6xnniivw4rx::::res://scenes/salsa_dancing.tscn
-::res://scripts/::1746691338
-Camera.gd::GDScript/GDScript::6507542867000729721::1746668929::0::1::::<>Camera3D<><>0<>0<><>::
-main.gd::GDScript/GDScript::6548215016147370586::1746691338::0::1::::<>Node3D<><>0<>0<><>::
-targets_cat.gd::GDScript/GDScript::636720702287509014::1746668061::0::1::::<>Node3D<><>0<>0<><>::
+salsa_dancing.tscn::PackedScene::6382412039507592397::1746759290::0::1::::<><><>0<>0<><>::uid://bi4n48jgmejf0::::res://scenes/Salsa Dancing.fbx<>uid://bacj52yh77rtk::::res://messirve.gd<>uid://dt6r5v4hlfmv6::::res://musica/MEHACESFALTA.mp3
+::res://scripts/::1746755007
+audio_listener_3d.gd::GDScript/GDScript::7790009726628203233::1746724838::0::1::::<>AudioListener3D<><>0<>0<><>::
+Camera.gd::GDScript/GDScript::6507542867000729721::1746726043::0::1::::<>Camera3D<><>0<>0<><>::
+main.gd::GDScript/GDScript::6548215016147370586::1746738857::0::1::::<>Node3D<><>0<>0<><>::
+targets_cat.gd::GDScript/GDScript::636720702287509014::1746755007::0::1::::<>Node3D<><>0<>0<><>::

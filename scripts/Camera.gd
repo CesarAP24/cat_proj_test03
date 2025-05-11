@@ -4,13 +4,14 @@ extends Camera3D
 @export var distancia: float = 200.0
 @export var altura: float = 150.0
 @export var angulo: float = 45.0
-@export var sensibilidad_rotacion: float = 0.3
+@export var sensibilidad_rotacion: float = 0.08
 @export var invertir_x: bool = false
 @export var invertir_y: bool = false
-# Adding zoom parameters
 @export var zoom_min: float = 10.0
 @export var zoom_max: float = 700.0
 @export var zoom_speed: float = 0.2
+@export var velocidad_suavizado: float = 10
+
 
 var rotacion_y = 0.0
 var rotacion_x = 0.0
@@ -87,5 +88,21 @@ func _process(delta):
 	offset.y = sin(rotacion_x) * distancia
 	offset.z = cos(rotacion_y) * distancia * cos(rotacion_x)
 	
-	global_transform.origin = center + offset
-	look_at(center, Vector3.UP)
+	# Suavizado de posición
+	var target_position = center + offset
+	var direction = target_position - global_transform.origin
+	global_transform.origin += direction * delta * 5
+	
+	# Suavizado de rotación
+	# Creamos una transformación temporal hacia el objetivo
+	var target_transform = global_transform.looking_at(center, Vector3.UP)
+	
+	# Obtenemos la rotación actual y la objetivo como quaterniones
+	var current_quat = global_transform.basis.get_rotation_quaternion()
+	var target_quat = target_transform.basis.get_rotation_quaternion()
+	
+	# Interpolamos entre las rotaciones usando slerp
+	var new_quat = current_quat.slerp(target_quat, delta * velocidad_suavizado)
+	
+	# Aplicamos la nueva rotación
+	global_transform.basis = Basis(new_quat)
