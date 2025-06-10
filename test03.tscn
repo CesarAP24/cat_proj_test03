@@ -25,7 +25,6 @@ volumetric_fog_density = 0.02
 
 [node name="Node3D" type="Node3D"]
 script = ExtResource("1_mrabx")
-camara_path = NodePath("Camera3D")
 
 [node name="AudioListener3D" type="AudioListener3D" parent="."]
 transform = Transform3D(0.999964, -0.00224809, 0.00812667, -0.0052107, 0.592981, 0.8052, -0.00662912, -0.805213, 0.592948, 0, 36.7529, 5.87417)
@@ -35,7 +34,9 @@ objetivo_path = NodePath("..")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.196153, 0.859778, 0.471494, -0.557627, -0.297711, 0.774868, 0.806583, -0.41491, 0.421038, -0.0548689, 51.2257, -13.7786)
-light_energy = 0.2
+light_color = Color(0.97, 0.965473, 0.9021, 1)
+light_energy = 0.688
+light_indirect_energy = 0.638
 light_volumetric_fog_energy = 0.192
 shadow_enabled = true
 directional_shadow_max_distance = 1434.7

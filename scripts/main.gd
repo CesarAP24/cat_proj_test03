@@ -1,15 +1,15 @@
 extends Node3D
 
-# Constantes de configuración
-const ESCALA = 0.05
+# Constantes de configuración (mantener igual)
+const ESCALA = 0.05*0.1
 const RADIO = 1
 
-# Parámetros exportables
+# Parámetros exportables (mantener igual)
 @export var VELOCIDAD_BASE_INICIAL = 1.2
 @export var VELOCIDAD_BASE = VELOCIDAD_BASE_INICIAL
 @export var VELOCIDAD_MOVIMIENTO = 0.8
-@export var VELOCIDAD_ROTACION = 0.1
-@export var DISTANCIA_ENTRE_PATAS = 12 * ESCALA
+@export var VELOCIDAD_ROTACION = 0.05
+@export var DISTANCIA_ENTRE_PATAS = 6 * ESCALA
 @export var LONGITUD_PASO = 210 * ESCALA
 @export var UMBRAL_DISTANCIA = 200 * ESCALA    
 @export var UMBRAL_PATAS_FRONT = 150 * ESCALA
@@ -26,15 +26,14 @@ const RADIO = 1
 @export var camara_path: NodePath
 var camara: Camera3D
 
-# Variables de control para velocidades de salto
-@export var VELOCIDAD_PREPARACION_SALTO = 1.5  # Velocidad durante la preparación (más baja = más lento)
-@export var VELOCIDAD_EJECUCION_SALTO = 0.5   # Velocidad durante el salto (más baja = más lento)
-@export var VELOCIDAD_ATERRIZAJE = 0.7         # Velocidad durante el aterrizaje (más baja = más lento)
+@export var VELOCIDAD_PREPARACION_SALTO = 1.5
+@export var VELOCIDAD_EJECUCION_SALTO = 0.5
+@export var VELOCIDAD_ATERRIZAJE = 0.7
 
-# Estados del movimiento
+# Estados del movimiento (mantener igual)
 enum Estado { PASO_1, PASO_2, PASO_3, PASO_4, PASO_5, SALTO_PREP, SALTO, ATERRIZAJE }
 
-# Variables de control
+# Variables de control (mantener igual)
 var estado_actual = Estado.PASO_1
 var direccion = Vector3(0, 0, 1)
 var punto_objetivo = Vector3(0, 0, 0)
@@ -43,45 +42,177 @@ var en_ciclo_salto = false
 var posicion_obstaculo = Vector3()
 var salto_es_bajada = false
 
-# Diccionarios para tracking
 var objetivos = {}
 var patas = {}
 var esferas = {}
 var posiciones_iniciales = {}
 var progreso_movimiento = {}
 
-# Inicialización del sistema
+# ================================
+# SISTEMA DE COMPORTAMIENTOS
+# ================================
+
+# Comportamiento base
+class BaseBehavior:
+	var context: Node3D
+	
+	func _init(ctx: Node3D):
+		context = ctx
+	
+	func enter():
+		pass
+	
+	func update():
+		pass
+	
+	func exit():
+		pass
+	
+	func can_transition_to(behavior_name: String) -> bool:
+		return false
+
+# Comportamiento de Caminata
+class WalkBehavior extends BaseBehavior:
+	
+	func _init(ctx: Node3D):
+		super(ctx)
+	
+	func enter():
+		# Lógica específica al entrar en modo caminar
+		pass
+	
+	func update():
+		# Lógica de actualización de estados de caminata (código original)
+		if context.debe_avanzar() and not context.en_ciclo_salto and context.es_necesario_saltar():
+			return "jump"  # Solicitar transición a salto
+		
+		# Estados de caminata normal (código original exacto)
+		if context.debe_avanzar() and (context.estado_actual == Estado.PASO_1 or context.estado_actual == Estado.PASO_5) and context.distancia(context.patas["frontL"], context.objetivos["frontL"]) < context.UMBRAL_PATAS_FRONT:
+			context.cambiar_estado(Estado.PASO_2)
+		elif context.distancia(context.patas["backR"], context.objetivos["backR"]) < context.UMBRAL_PATAS_BACK and context.estado_actual == Estado.PASO_2:
+			context.cambiar_estado(Estado.PASO_3)
+		elif context.debe_avanzar() and context.estado_actual == Estado.PASO_3 and context.distancia(context.patas["frontR"], context.objetivos["frontR"]) < context.UMBRAL_PATAS_FRONT:
+			context.cambiar_estado(Estado.PASO_4)
+		elif context.distancia(context.patas["backL"], context.objetivos["backL"]) < context.UMBRAL_PATAS_BACK and context.estado_actual == Estado.PASO_4:
+			context.cambiar_estado(Estado.PASO_5)
+		
+		return "walk"  # Mantenerse en caminata
+	
+	func exit():
+		# Lógica al salir del modo caminar
+		pass
+	
+	func can_transition_to(behavior_name: String) -> bool:
+		return behavior_name == "jump"
+
+# Comportamiento de Salto
+class JumpBehavior extends BaseBehavior:
+	
+	func _init(ctx: Node3D):
+		super(ctx)
+	
+	func enter():
+		# Lógica específica al entrar en modo salto
+		context.en_ciclo_salto = true
+		context.cambiar_estado(Estado.SALTO_PREP)
+	
+	func update():
+		# Lógica de estados de salto (código original exacto)
+		match context.estado_actual:
+			Estado.SALTO_PREP:
+				context.salto_es_bajada = context.posicion_obstaculo.y < context.obtener_centro().y
+				if context.todas_patas_en_posicion(): 
+					context.cambiar_estado(Estado.SALTO)
+			Estado.SALTO:
+				if context.patas_delanteras_en_objetivo(): 
+					context.cambiar_estado(Estado.ATERRIZAJE)
+			Estado.ATERRIZAJE:
+				if context.patas_traseras_en_objetivo():
+					return "walk"  # Solicitar transición a caminata
+		
+		return "jump"  # Mantenerse en salto
+	
+	func exit():
+		# Lógica al salir del modo salto
+		context.en_ciclo_salto = false
+		context.cambiar_estado(Estado.PASO_1)
+	
+	func can_transition_to(behavior_name: String) -> bool:
+		return behavior_name == "walk"
+
+# Handler de Comportamientos
+class BehaviorHandler:
+	var behaviors = {}
+	var current_behavior: BaseBehavior
+	var current_behavior_name: String = ""
+	var context: Node3D
+	
+	func _init(ctx: Node3D):
+		context = ctx
+		_setup_behaviors()
+	
+	func _setup_behaviors():
+		behaviors["walk"] = WalkBehavior.new(context)
+		behaviors["jump"] = JumpBehavior.new(context)
+		# Aquí puedes agregar fácilmente nuevos comportamientos:
+		# behaviors["idle"] = IdleBehavior.new(context)
+		# behaviors["run"] = RunBehavior.new(context)
+		# behaviors["attack"] = AttackBehavior.new(context)
+	
+	func start_behavior(behavior_name: String):
+		if behavior_name in behaviors:
+			current_behavior_name = behavior_name
+			current_behavior = behaviors[behavior_name]
+			current_behavior.enter()
+	
+	func update():
+		if current_behavior:
+			var next_behavior = current_behavior.update()
+			
+			# Verificar si necesita cambiar de comportamiento
+			if next_behavior != current_behavior_name:
+				transition_to(next_behavior)
+	
+	func transition_to(behavior_name: String):
+		if behavior_name in behaviors:
+			if current_behavior and current_behavior.can_transition_to(behavior_name):
+				current_behavior.exit()
+				start_behavior(behavior_name)
+	
+	func get_current_behavior_name() -> String:
+		return current_behavior_name
+	
+	func add_behavior(name: String, behavior: BaseBehavior):
+		behaviors[name] = behavior
+
+# Instancia del handler
+var behavior_handler: BehaviorHandler
+
+# ================================
+# FUNCIONES PRINCIPALES (mantener igual)
+# ================================
+
 func _ready():
 	VELOCIDAD_BASE = VELOCIDAD_BASE_INICIAL
 	inicializar()
 	if camara_path:
 		camara = get_node(camara_path)
+	
+	# Inicializar sistema de comportamientos
+	behavior_handler = BehaviorHandler.new(self)
+	behavior_handler.start_behavior("walk")
 
-func obtener_direccion_camara():
-	if not camara:
-		return direccion
+func _process(delta):
+	# Usar el handler en lugar de actualizar_maquina_estados()
+	behavior_handler.update()
 	
-	# Obtener la orientación de la cámara (ignorando componente Y)
-	var orientacion_camara = -camara.global_transform.basis.z
-	orientacion_camara.y = 0
-	orientacion_camara = orientacion_camara.normalized()
-	
-	# Obtener vector derecha de la cámara (ignorando componente Y)
-	var derecha_camara = camara.global_transform.basis.x
-	derecha_camara.y = 0
-	derecha_camara = derecha_camara.normalized()
-	
-	# Convertir entrada de teclado a dirección relativa a la cámara
-	var input_dir = Vector3.ZERO
-	
-	if Input.is_key_pressed(KEY_W): input_dir += orientacion_camara
-	if Input.is_key_pressed(KEY_S): input_dir -= orientacion_camara
-	if Input.is_key_pressed(KEY_D): input_dir -= derecha_camara
-	if Input.is_key_pressed(KEY_A): input_dir += derecha_camara
-	
-	if input_dir.length() > 0.1:
-		return input_dir.normalized()
-	return direccion
+	mover_patas(delta)
+	actualizar_representacion_visual()
+	manejar_movimiento_objetivo()
+
+# ================================
+# FUNCIONES AUXILIARES (mantener exactamente igual)
+# ================================
 
 # Configura las posiciones iniciales de las patas
 func inicializar():
@@ -167,19 +298,12 @@ func manejar_movimiento_objetivo():
 		if Input.is_key_pressed(KEY_D): punto_objetivo.x -= velocidad_objetivo
 	
 	
-	punto_objetivo.y = obtener_centro().y + 3
+	punto_objetivo.y = obtener_centro().y + 4*ESCALA
 	
 
 # Establece un objetivo externo
 func set_target(new_target):
 	punto_objetivo = new_target
-
-# Función principal de proceso
-func _process(delta):
-	actualizar_maquina_estados()
-	mover_patas(delta)
-	actualizar_representacion_visual()
-	manejar_movimiento_objetivo()
 
 # Gestiona las transiciones entre estados
 func actualizar_maquina_estados():
@@ -453,7 +577,7 @@ func mover_patas(delta):
 			
 	if debe_avanzar() and not en_ciclo_salto:
 		var dist = distancia(obtener_centro(), punto_objetivo)
-		var factor_velocidad = 2/(0.2*dist)
+		var factor_velocidad = 1
 		var velocidad_rot = VELOCIDAD_ROTACION * VELOCIDAD_BASE * (1.0 + factor_velocidad)
 		direccion = rotar_hacia(direccion, punto_objetivo, velocidad_rot)
 # Calcula la posición intermedia durante el movimiento

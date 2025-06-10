@@ -1,6 +1,13 @@
 res://default_env.tres
-res://scenes/cat_model.tscn
+res://world.tscn
+res://addons/so_fluffy/turbulence_default.tres
+res://addons/so_fluffy/so_fluffy.gdshader
+res://models/milo.tres
 res://test03.tscn
-res://scenes/salsa_dancing.tscn
+res://scripts/clases/locomotion_state_machine.gd
+res://scripts/clases/state_behaviors.gd
+res://scripts/clases/leg_controller.gd
+res://scripts/clases/movement_controller.gd
+res://scripts/clases/main.gd
+res://scripts/clases/locomotion_components.gd
 res://scripts/main.gd
-res://scripts/targets_cat.gd

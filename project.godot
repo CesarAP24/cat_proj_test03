@@ -19,6 +19,10 @@ config/icon="res://icon.png"
 
 window/size/viewport_width=1020
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/so_fluffy/plugin.cfg")
+
 [gui]
 
 common/drop_mouse_on_gui_input_disabled=true

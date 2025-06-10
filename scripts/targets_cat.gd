@@ -130,7 +130,7 @@ func update_column(skeleton: Skeleton3D, bones: Array, target: Vector3, delta: f
 func get_target_pos():
 	var patas = objetivo.call("obtener_patas")
 	if (patas):
-		var out = (patas["frontL"] + patas["frontR"])/2
+		var out = (patas["frontL"]/scale.x + patas["frontR"]/scale.x)/2
 		out.y += offset_y/2
 		return out + objetivo.call("obtener_direccion")*1.5
 	return Vector3(0,0,0)
