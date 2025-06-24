@@ -18,7 +18,7 @@ extends Node3D
 @export var spring_stiffness: float = 250.0  # Controls how strongly the spring pulls
 @export var spring_damping: float = 15  # Controls how quickly oscillations settle
 @export var mass: float = 1.0             # Simulated mass of the head
-var column_bones = ["spine","spine.001","spine.002","spine.003"]
+var column_bones = ["spine","spine.001","spine.002","spine.003", "spine.004"]
 var foot_bones = ["f_toe.R", "f_toe.L"]
 
 @onready var helper = 0
@@ -132,7 +132,7 @@ func get_target_pos():
 	if (patas):
 		var out = (patas["frontL"]/scale.x + patas["frontR"]/scale.x)/2
 		out.y += offset_y/2
-		return out + objetivo.call("obtener_direccion")*1.5
+		return out + objetivo.call("obtener_direccion")*2.5
 	return Vector3(0,0,0)
 	
 func update_magnet_pos():

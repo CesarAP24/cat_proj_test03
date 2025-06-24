@@ -1,9 +1,10 @@
-[gd_scene load_steps=10 format=3 uid="uid://bs6r5b78pl80i"]
+[gd_scene load_steps=11 format=3 uid="uid://bs6r5b78pl80i"]
 
 [ext_resource type="Script" uid="uid://c0kae6f0h1cyc" path="res://scripts/main.gd" id="1_mrabx"]
 [ext_resource type="Script" uid="uid://di8sk7kmiq0wr" path="res://scripts/audio_listener_3d.gd" id="2_4rhi5"]
 [ext_resource type="Script" uid="uid://cyykjr8fvts8h" path="res://scripts/Camera.gd" id="2_v4jus"]
 [ext_resource type="PackedScene" uid="uid://b8hniu3f6w3v0" path="res://scenes/cat_model.tscn" id="3_4rhi5"]
+[ext_resource type="PackedScene" uid="uid://cppicxpa1x7l5" path="res://scenes/black_model.tscn" id="4_4rhi5"]
 [ext_resource type="PackedScene" uid="uid://cw6xnniivw4rx" path="res://scenes/salsa_dancing.tscn" id="4_osey5"]
 
 [sub_resource type="Sky" id="6"]
@@ -24,7 +25,9 @@ volumetric_fog_density = 0.02
 [sub_resource type="BoxMesh" id="3"]
 
 [node name="Node3D" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 0.99999, -0.00439822, 0, 0.00439822, 0.99999, 0, 0, 0)
 script = ExtResource("1_mrabx")
+camara_path = NodePath("Camera3D")
 
 [node name="AudioListener3D" type="AudioListener3D" parent="."]
 transform = Transform3D(0.999964, -0.00224809, 0.00812667, -0.0052107, 0.592981, 0.8052, -0.00662912, -0.805213, 0.592948, 0, 36.7529, 5.87417)
@@ -54,7 +57,14 @@ altura = 10.0
 angulo = 35.0
 invertir_x = true
 
+[node name="black_model" parent="." instance=ExtResource("4_4rhi5")]
+objetivo_path = NodePath("..")
+offset_y = 7.0
+spring_stiffness = 400.0
+spring_damping = 30.0
+
 [node name="cat_model" parent="." instance=ExtResource("3_4rhi5")]
+visible = false
 objetivo_path = NodePath("..")
 offset_y = 7.0
 spring_stiffness = 400.0
@@ -72,67 +82,13 @@ shape = SubResource("2")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody3D" groups=["suelo"]]
 mesh = SubResource("3")
 
-[node name="StaticBody2" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
-transform = Transform3D(31.2981, 0, 0, 0, 4.93207, 0, 0, 0, 124.695, 111.945, 2.66997, 0)
+[node name="StaticBody3D2" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
+transform = Transform3D(345.966, 0, 0, 0, -0.107635, 1421.62, 0, 0.0932266, 1641.33, 0.0563974, 688.181, 1237.17)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody2" groups=["suelo"]]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody3D2" groups=["suelo"]]
 shape = SubResource("2")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody2" groups=["suelo"]]
-mesh = SubResource("3")
-
-[node name="StaticBody4" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
-transform = Transform3D(34.8054, 0, 0, 0, 8.54696, 0, 0, 0, 124.695, 137.715, 6.01286, 0)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody4" groups=["suelo"]]
-shape = SubResource("2")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody4" groups=["suelo"]]
-mesh = SubResource("3")
-
-[node name="StaticBody5" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
-transform = Transform3D(52.2017, 0, 0, 0, 32.779, 0, 0, 0, 124.695, 172.091, 4.57077, 0)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody5" groups=["suelo"]]
-shape = SubResource("2")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody5" groups=["suelo"]]
-mesh = SubResource("3")
-
-[node name="StaticBody7" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
-transform = Transform3D(76.4993, 0, 0, 0, 66.0727, 0, 0, 0, 87.7028, -73.5556, 14.13, 86.8465)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody7" groups=["suelo"]]
-shape = SubResource("2")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody7" groups=["suelo"]]
-mesh = SubResource("3")
-
-[node name="StaticBody8" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
-transform = Transform3D(76.4993, 0, 0, 0, 95.1485, 0, 0, 0, 87.7028, -73.5556, 40.0102, 160.747)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody8" groups=["suelo"]]
-shape = SubResource("2")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody8" groups=["suelo"]]
-mesh = SubResource("3")
-
-[node name="StaticBody9" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
-transform = Transform3D(78.5068, 0, 0, 0, 177.364, 0, 0, 0, 90.0043, -73.5556, 40.0102, 220.8)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody9" groups=["suelo"]]
-shape = SubResource("2")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody9" groups=["suelo"]]
-mesh = SubResource("3")
-
-[node name="StaticBody6" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
-transform = Transform3D(33.5871, 0, 0, 0, 22.1751, 0, 0, 0, 124.695, 197.862, 29.1375, 0)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody6" groups=["suelo"]]
-shape = SubResource("2")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody6" groups=["suelo"]]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody3D2" groups=["suelo"]]
 mesh = SubResource("3")
 
 [node name="StaticBody10" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
@@ -208,12 +164,57 @@ shape = SubResource("2")
 mesh = SubResource("3")
 
 [node name="StaticBody3" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
-transform = Transform3D(171.292, 6.7642, 0, -34.8955, 17.0703, 0, 0, 0, 121.9, -198.061, 15.3365, 0)
+transform = Transform3D(171.292, 6.7642, 0, -34.8955, 17.0703, 0, 0, 0, 121.9, -267.119, 15.3365, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody3" groups=["suelo"]]
 shape = SubResource("2")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody3" groups=["suelo"]]
+mesh = SubResource("3")
+
+[node name="StaticBody4" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
+transform = Transform3D(171.292, 6.7642, 0, -34.8955, 17.0703, 0, 0, 0, 121.9, -439.178, 15.3365, 4.6867)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody4" groups=["suelo"]]
+shape = SubResource("2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody4" groups=["suelo"]]
+mesh = SubResource("3")
+
+[node name="StaticBody8" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
+transform = Transform3D(169.489, -1.30379, 0, 42.8033, 18.3153, 0, 0, 0, 121.9, -608.997, 15.3365, -230.25)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody8" groups=["suelo"]]
+shape = SubResource("2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody8" groups=["suelo"]]
+mesh = SubResource("3")
+
+[node name="StaticBody5" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
+transform = Transform3D(171.292, 6.7642, 0, -34.8955, 17.0703, 0, 0, 0, 363.121, -612.303, 15.3365, 4.6867)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody5" groups=["suelo"]]
+shape = SubResource("2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody5" groups=["suelo"]]
+mesh = SubResource("3")
+
+[node name="StaticBody6" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
+transform = Transform3D(173.176, 0.724146, 0, 23.8493, 18.3473, 0, 0, 0, 363.121, -442.291, 15.3365, -229.157)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody6" groups=["suelo"]]
+shape = SubResource("2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody6" groups=["suelo"]]
+mesh = SubResource("3")
+
+[node name="StaticBody7" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
+transform = Transform3D(173.176, 0.724146, 0, 23.8493, 18.3473, 0, 0, 0, 363.121, -442.291, 15.3365, 237.482)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody7" groups=["suelo"]]
+shape = SubResource("2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody7" groups=["suelo"]]
 mesh = SubResource("3")
 
 [node name="Salsa Dancing" parent="." instance=ExtResource("4_osey5")]

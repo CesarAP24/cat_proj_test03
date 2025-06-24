@@ -1,7 +1,10 @@
 res://default_env.tres
-res://world.tscn
+res://scenes/cat_model.tscn
 res://addons/so_fluffy/turbulence_default.tres
 res://addons/so_fluffy/so_fluffy.gdshader
 res://models/milo.tres
+res://black_model.tscn
 res://test03.tscn
+res://scenes/black_model.tscn
 res://scripts/main.gd
+res://scripts/targets_cat.gd
