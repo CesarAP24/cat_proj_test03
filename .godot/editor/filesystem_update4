@@ -4,10 +4,4 @@ res://addons/so_fluffy/turbulence_default.tres
 res://addons/so_fluffy/so_fluffy.gdshader
 res://models/milo.tres
 res://test03.tscn
-res://scripts/clases/locomotion_state_machine.gd
-res://scripts/clases/state_behaviors.gd
-res://scripts/clases/leg_controller.gd
-res://scripts/clases/movement_controller.gd
-res://scripts/clases/main.gd
-res://scripts/clases/locomotion_components.gd
 res://scripts/main.gd

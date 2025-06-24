@@ -1,7 +1,8 @@
 extends Node3D
 
 # Constantes de configuración (mantener igual)
-const ESCALA = 0.05*0.1
+const ESCALA = 0.05
+#*0.1
 const RADIO = 1
 
 # Parámetros exportables (mantener igual)
