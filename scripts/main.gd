@@ -5,41 +5,239 @@ const RADIO = 1
 
 @export var VELOCIDAD_BASE_INICIAL = 1.2
 @export var VELOCIDAD_BASE = VELOCIDAD_BASE_INICIAL
-@export var VELOCIDAD_MOVIMIENTO = 0.5
-@export var VELOCIDAD_ROTACION = 0.05
-@export var DISTANCIA_ENTRE_PATAS = 6 * ESCALA
-@export var LONGITUD_PASO = 230 * ESCALA
+@export var VELOCIDAD_MOVIMIENTO = 0.7
+@export var VELOCIDAD_ROTACION = 0.1
+@export var DISTANCIA_ENTRE_PATAS = 12 * ESCALA
+@export var LONGITUD_PASO = 220 * ESCALA
 @export var UMBRAL_DISTANCIA = 200 * ESCALA    
-@export var UMBRAL_PATAS_FRONT = 185 * ESCALA
-@export var UMBRAL_PATAS_BACK = 100 * ESCALA
-@export var ALTURA_PASO = 80 * ESCALA
-@export var RANDOM_DISTANCE = 0
+@export var UMBRAL_PATAS_FRONT = 140 * ESCALA
+@export var UMBRAL_PATAS_BACK = 110 * ESCALA
+@export var ALTURA_PASO = 70 * ESCALA
+@export var RANDOM_DISTANCE = 0.0
 @export var MIN_HEIGHT_JUMP = 120 * ESCALA
-@export var MAX_HEIGHT_JUMP = 120 * 3 * ESCALA
-@export var UMBRAL_DETECCION_SALTO = 400 * ESCALA
-@export var MARGEN_SALTO_ADELANTE = 30 * ESCALA
+@export var MAX_HEIGHT_JUMP = 120 * 5 * ESCALA
+@export var UMBRAL_DETECCION_SALTO = 270 * ESCALA
+@export var MARGEN_SALTO_ADELANTE = 50 * ESCALA
 @export var MOVEMENT_TARGET_SPEED = 1.5
 @export var DEBUG = false
 
 @export var camara_path: NodePath
 var camara: Camera3D
 
-@export var VELOCIDAD_PREPARACION_SALTO = 1.5
-@export var VELOCIDAD_EJECUCION_SALTO = 0.4
-@export var VELOCIDAD_ATERRIZAJE = 0.7
+@export var VELOCIDAD_PREPARACION_SALTO = 1.8
+@export var VELOCIDAD_EJECUCION_SALTO = 0.8
+@export var VELOCIDAD_ATERRIZAJE = 1.1
 
 @export var RADIO_BUSQUEDA_PATA = 200 * ESCALA
 @export var UMBRAL_ALTURA_CRITICA = 80 * ESCALA
 @export var UMBRAL_ALTURA_SUTIL = 20 * ESCALA
-@export var PUNTOS_BUSQUEDA = 64
+@export var PUNTOS_BUSQUEDA = 32
 @export var PESO_DISTANCIA = 0.3
 @export var PESO_ALTURA = 0.7
 @export var DISTANCIA_MAXIMA_PATA = 300 * ESCALA
 @export var DISTANCIA_PARA_CORRER = 1500 * ESCALA
-@export var DISTANCIA_PARAR_CORRER = 400 * ESCALA
+@export var DISTANCIA_PARAR_CORRER = 1000 * ESCALA
 @export var SALTO_CORRER_MAX = 400 * ESCALA
 @export var SALTO_CORRER_MIN = 180 * ESCALA
-@export var VELOCIDAD_CORRER = 1  # Multiplicador de velocidad al correr
+@export var VELOCIDAD_CORRER = 1
+
+# Variables para el sistema de cola felina
+@export var LONGITUD_COLA = 40 * ESCALA
+@export var ALTURA_BASE_COLA = 30 * ESCALA  # Altura base sobre las patas traseras
+@export var AMPLITUD_FLOTACION = 10 * ESCALA  # Qué tanto "flota" arriba y abajo
+@export var AMPLITUD_LATERAL = 70 * ESCALA  # Movimiento lateral caprichoso
+@export var VELOCIDAD_ONDULACION = 2  # Velocidad del movimiento ondulante
+@export var FACTOR_PERSONALIDAD = 3.0  # Multiplicador de "capricho" del gato
+@export var SENSIBILIDAD_MOVIMIENTO = 5.0  # Qué tanto reacciona al movimiento del cuerpo
+
+var cola_posicion: Vector3
+var cola_tiempo: float = 0.0
+var cola_offset_personal: Vector3 = Vector3.ZERO  # Offset aleatorio personal del gato
+var cola_intensidad_actual: float = 1.0
+var cola_direccion_preferida: float = 0.0  # El gato "prefiere" mover la cola hacia un lado
+var ultimo_cambio_preferencia: float = 0.0
+
+# Estados emocionales de la cola
+enum EstadoCola { RELAJADA, CURIOSA, ALERTA, JUGUETONA, CONCENTRADA }
+var estado_cola_actual = EstadoCola.RELAJADA
+
+# Agregar esto en _ready() después de la inicialización existente
+func inicializar_cola():
+	# Generar personalidad única para este gato
+	cola_direccion_preferida = randf_range(-1.0, 1.0)  # Algunos gatos prefieren un lado
+	cola_offset_personal = Vector3(
+		randf_range(-0.3, 0.3),
+		randf_range(-0.2, 0.4),
+		randf_range(-0.3, 0.3)
+	)
+	
+	# Posición inicial de la cola flotando
+	var centro_trasero = (patas["backL"] + patas["backR"]) / 2
+	cola_posicion = centro_trasero + Vector3(0, ALTURA_BASE_COLA, -LONGITUD_COLA * 0.7)
+	
+	# Crear representación visual de la cola
+	if DEBUG:
+		var esfera_cola = MeshInstance3D.new()
+		esfera_cola.name = "cola_tip"
+		esfera_cola.mesh = SphereMesh.new()
+		esfera_cola.scale = Vector3(RADIO * 1.5, RADIO * 1.5, RADIO * 1.5)
+		esfera_cola.material_override = crear_material(Color(0.9, 0.6, 0.1))  # Dorado gatuno
+		add_child(esfera_cola)
+		esferas["cola_tip"] = esfera_cola
+
+# Agregar esto en _process() después de las llamadas existentes
+func actualizar_cola(delta):
+	cola_tiempo += delta * VELOCIDAD_ONDULACION
+	ultimo_cambio_preferencia += delta
+	
+	# Cambiar ocasionalmente la "preferencia" del gato (cada 3-8 segundos)
+	if ultimo_cambio_preferencia > randf_range(3.0, 8.0):
+		cola_direccion_preferida = randf_range(-1.0, 1.0)
+		ultimo_cambio_preferencia = 0.0
+	
+	# Determinar estado emocional basado en actividad
+	determinar_estado_emocional()
+	
+	# Calcular posición base de la cola
+	var centro_trasero = (patas["backL"] + patas["backR"]) / 2
+	
+	# Comportamiento específico según lo que está haciendo el gato
+	var patron_movimiento = calcular_patron_segun_actividad(delta)
+	
+	# Aplicar el patrón de movimiento
+	cola_posicion = centro_trasero + patron_movimiento
+	
+	# Agregar "personalidad" del gato individual
+	cola_posicion += cola_offset_personal * FACTOR_PERSONALIDAD
+	
+	# Actualizar visualización
+	if DEBUG and "cola_tip" in esferas:
+		esferas["cola_tip"].position = cola_posicion
+
+func determinar_estado_emocional():
+	match behavior_handler.get_current_behavior_name():
+		"walk":
+			if debe_avanzar():
+				estado_cola_actual = EstadoCola.CURIOSA
+			else:
+				estado_cola_actual = EstadoCola.RELAJADA
+		"run":
+			estado_cola_actual = EstadoCola.ALERTA
+		"jump":
+			if estado_actual == Estado.SALTO_PREP:
+				estado_cola_actual = EstadoCola.CONCENTRADA
+			else:
+				estado_cola_actual = EstadoCola.ALERTA
+
+func calcular_patron_segun_actividad(delta: float) -> Vector3:
+	var posicion_base = Vector3()
+	
+	match estado_cola_actual:
+		EstadoCola.RELAJADA:
+			posicion_base = patron_cola_relajada()
+		EstadoCola.CURIOSA:
+			posicion_base = patron_cola_curiosa()
+		EstadoCola.ALERTA:
+			posicion_base = patron_cola_alerta()
+		EstadoCola.CONCENTRADA:
+			posicion_base = patron_cola_concentrada()
+		EstadoCola.JUGUETONA:
+			posicion_base = patron_cola_juguetona()
+	
+	return posicion_base
+
+func patron_cola_relajada() -> Vector3:
+	# Movimiento suave en forma de "S", como gato descansando pero atento
+	var vector_lateral = Vector3(direccion.z, 0, -direccion.x).normalized()
+	var vector_atras = -direccion.normalized()
+	
+	var lateral = (sin(cola_tiempo * 0.8) * 0.4 + cola_direccion_preferida * 0.3) * AMPLITUD_LATERAL
+	var y = ALTURA_BASE_COLA + sin(cola_tiempo * 0.5) * AMPLITUD_FLOTACION * 0.3
+	var atras = LONGITUD_COLA * 0.8 + sin(cola_tiempo * 0.6) * LONGITUD_COLA * 0.1
+	
+	return vector_lateral * lateral + Vector3(0, y, 0) + vector_atras * atras
+
+func patron_cola_curiosa() -> Vector3:
+	# Movimiento más animado, como gato explorando
+	# Combina ondulación lateral con movimiento vertical más pronunciado
+	var factor_velocidad = min(VELOCIDAD_BASE, 2.0)
+	var vector_lateral = Vector3(direccion.z, 0, -direccion.x).normalized()
+	var vector_atras = -direccion.normalized()
+	
+	var lateral = (sin(cola_tiempo * 1.2) + sin(cola_tiempo * 2.1) * 0.3) * 0.6 * AMPLITUD_LATERAL
+	# Agregar "capricho" extra cuando está curioso
+	lateral += sin(cola_tiempo * 3.2) * 0.2 * FACTOR_PERSONALIDAD * AMPLITUD_LATERAL
+	
+	var y = ALTURA_BASE_COLA + sin(cola_tiempo * 1.0) * AMPLITUD_FLOTACION * 0.6 * factor_velocidad
+	var atras = LONGITUD_COLA * 0.6 + cos(cola_tiempo * 0.8) * LONGITUD_COLA * 0.2
+	
+	return vector_lateral * lateral + Vector3(0, y, 0) + vector_atras * atras
+
+func patron_cola_alerta() -> Vector3:
+	# Movimiento más rígido pero expresivo, cola más erguida
+	var factor_intensidad = 1.0
+	if behavior_handler.get_current_behavior_name() == "run":
+		factor_intensidad = 1.5
+	
+	var vector_lateral = Vector3(direccion.z, 0, -direccion.x).normalized()
+	var vector_atras = -direccion.normalized()
+	
+	var lateral = (cola_direccion_preferida * 0.5 + sin(cola_tiempo * 2.0) * 0.3) * AMPLITUD_LATERAL
+	var y = ALTURA_BASE_COLA * 1.5 + sin(cola_tiempo * 1.5) * AMPLITUD_FLOTACION * 0.4 * factor_intensidad
+	var atras = LONGITUD_COLA * 0.5 + sin(cola_tiempo * 1.8) * LONGITUD_COLA * 0.15
+	
+	return vector_lateral * lateral + Vector3(0, y, 0) + vector_atras * atras
+
+func patron_cola_concentrada() -> Vector3:
+	# Movimiento muy controlado, como gato preparándose para saltar
+	# La cola se mueve lentamente pero con precision
+	var vector_lateral = Vector3(direccion.z, 0, -direccion.x).normalized()
+	var vector_atras = -direccion.normalized()
+	
+	var lateral = (sin(cola_tiempo * 0.4) * 0.7 + cola_direccion_preferida * 0.4) * AMPLITUD_LATERAL
+	# Pequeños "temblores" de concentración
+	lateral += sin(cola_tiempo * 8.0) * 0.05 * AMPLITUD_LATERAL
+	
+	var y = ALTURA_BASE_COLA * 1.2 + cos(cola_tiempo * 0.3) * AMPLITUD_FLOTACION * 0.3
+	var atras = LONGITUD_COLA * 0.4 + sin(cola_tiempo * 0.5) * LONGITUD_COLA * 0.1
+	
+	return vector_lateral * lateral + Vector3(0, y, 0) + vector_atras * atras
+
+func patron_cola_juguetona() -> Vector3:
+	# Movimiento errático y divertido (se podría activar aleatoriamente)
+	var vector_lateral = Vector3(direccion.z, 0, -direccion.x).normalized()
+	var vector_atras = -direccion.normalized()
+	
+	var lateral = sin(cola_tiempo * 2.5) * cos(cola_tiempo * 1.3) * 0.8 * AMPLITUD_LATERAL
+	var y = ALTURA_BASE_COLA + abs(sin(cola_tiempo * 1.8)) * AMPLITUD_FLOTACION * 0.8
+	var atras = LONGITUD_COLA * 0.7 + sin(cola_tiempo * 2.2) * LONGITUD_COLA * 0.3
+	
+	return vector_lateral * lateral + Vector3(0, y, 0) + vector_atras * atras
+
+# Función para que otros sistemas puedan "influir" en la cola
+func activar_modo_jugueton(duracion: float = 3.0):
+	estado_cola_actual = EstadoCola.JUGUETONA
+	# Crear un timer para regresar al estado normal
+	get_tree().create_timer(duracion).timeout.connect(func(): estado_cola_actual = EstadoCola.RELAJADA)
+
+# Función para cambiar la personalidad del gato
+func cambiar_personalidad(factor: float, nueva_preferencia: float = 999.0):
+	FACTOR_PERSONALIDAD = clamp(factor, 0.1, 3.0)
+	if nueva_preferencia != 999.0:
+		cola_direccion_preferida = clamp(nueva_preferencia, -1.0, 1.0)
+
+# Función para obtener info de la cola
+func obtener_info_cola() -> Dictionary:
+	return {
+		"posicion": cola_posicion,
+		"estado": EstadoCola.keys()[estado_cola_actual],
+		"personalidad": FACTOR_PERSONALIDAD,
+		"preferencia_lateral": cola_direccion_preferida
+	}
+
+func obtener_posicion_cola() -> Vector3:
+	return cola_posicion
+
 
 enum Estado { PASO_1, PASO_2, PASO_3, PASO_4, PASO_5, SALTO_PREP, SALTO, ATERRIZAJE, CORRER_PREP, CORRER_SALTO, CORRER_ATERRIZAJE }
 
@@ -50,6 +248,7 @@ var tiempo = 0
 var en_ciclo_salto = false
 var posicion_obstaculo = Vector3()
 var salto_es_bajada = false
+var salto_es_alto = false
 
 var objetivos = {}
 var patas = {}
@@ -132,12 +331,12 @@ class RunBehavior extends BaseBehavior:
 	func update():
 		var dist_target = context.distancia(context.obtener_centro(), context.punto_objetivo)
 		
-		# SIEMPRE verificar si debe cambiar a walk, sin importar el estado actual
 		if dist_target < context.DISTANCIA_PARAR_CORRER:
 			return "walk"
 		
 		match context.estado_actual:
 			Estado.CORRER_PREP:
+				context.salto_es_alto = (context.posicion_obstaculo.y - context.obtener_centro().y) > 4
 				if context.todas_patas_en_posicion_correr():
 					context.cambiar_estado(Estado.CORRER_SALTO)
 			Estado.CORRER_SALTO:
@@ -145,7 +344,6 @@ class RunBehavior extends BaseBehavior:
 					context.cambiar_estado(Estado.CORRER_ATERRIZAJE)
 			Estado.CORRER_ATERRIZAJE:
 				if context.patas_traseras_en_obj_correr():
-					# Verificar distancia otra vez antes de continuar
 					dist_target = context.distancia(context.obtener_centro(), context.punto_objetivo)
 					if dist_target < context.DISTANCIA_PARAR_CORRER:
 						return "walk"
@@ -155,7 +353,6 @@ class RunBehavior extends BaseBehavior:
 		return "run"
 	
 	func exit():
-		# Al salir del modo correr, asegurar que entre en modo caminata normal
 		context.estado_actual = Estado.PASO_1
 	
 	func can_transition_to(behavior_name: String) -> bool:
@@ -201,12 +398,15 @@ func _ready():
 	if camara_path: camara = get_node(camara_path)
 	behavior_handler = BehaviorHandler.new(self)
 	behavior_handler.start_behavior("walk")
+	inicializar_cola()
+
 
 func _process(delta):
 	behavior_handler.update()
 	mover_patas(delta)
 	actualizar_representacion_visual()
 	manejar_movimiento_objetivo()
+	actualizar_cola(delta)
 
 func inicializar():
 	objetivos = {
@@ -256,7 +456,9 @@ func crear_material(color):
 	return mat
 
 func manejar_movimiento_objetivo():
-	var velocidad_objetivo = 0.2 * 2 * MOVEMENT_TARGET_SPEED
+	# Verificar si Shift está presionado para cambiar la velocidad
+	var velocidad_multiplicador = 4.0 if Input.is_key_pressed(KEY_SHIFT) else 1.5
+	var velocidad_objetivo = 0.2 * 2 * velocidad_multiplicador
 	var input_dir = Vector3.ZERO
 	
 	if camara:
@@ -280,7 +482,7 @@ func manejar_movimiento_objetivo():
 	if input_dir.length() > 0.1:
 		punto_objetivo += input_dir.normalized() * velocidad_objetivo
 	
-	punto_objetivo.y = obtener_centro().y + 4 * ESCALA
+	punto_objetivo.y = obtener_centro().y + 3
 
 func set_target(new_target):
 	punto_objetivo = new_target
@@ -295,7 +497,6 @@ func validar_siguiente_paso() -> bool:
 	var altura_L = obtener_punto_mas_alto(pos_frontL.x, pos_frontL.z, "suelo").y
 	var altura_R = obtener_punto_mas_alto(pos_frontR.x, pos_frontR.z, "suelo").y
 	
-	# Si hay precipicio adelante, buscar camino por el borde
 	if altura_L < centro.y - UMBRAL_ALTURA_CRITICA or altura_R < centro.y - UMBRAL_ALTURA_CRITICA:
 		var pos_borde = buscar_posicion_borde_seguro(centro + dir_norm * LONGITUD_PASO)
 		return pos_borde != Vector3.ZERO
@@ -306,10 +507,9 @@ func buscar_posicion_borde_seguro(pos_ideal: Vector3) -> Vector3:
 	var centro = obtener_centro()
 	var dir_objetivo = (punto_objetivo - centro).normalized()
 	
-	# Buscar en arco de 120° hacia los lados (nunca hacia atrás)
 	for i in range(24):
-		var factor = (i / 11.0) - 1.0  # -1 a 1
-		var angulo_offset = factor * deg_to_rad(60.0)  # 60° a cada lado
+		var factor = (i / 11.0) - 1.0
+		var angulo_offset = factor * deg_to_rad(60.0)
 		
 		var dir_rotado = Vector3(
 			dir_objetivo.x * cos(angulo_offset) - dir_objetivo.z * sin(angulo_offset),
@@ -371,7 +571,6 @@ func cambiar_estado(nuevo_estado):
 			progreso_movimiento["frontL"] = 0.0
 		
 		Estado.CORRER_PREP:
-			# Preparar para el próximo salto - solo juntar las patas un poco
 			var pos_base = centro + dir_norm * (LONGITUD_PASO * 0.3)
 			
 			objetivos["frontL"] = pos_base + Vector3(direccion.z, 0, -direccion.x) * (DISTANCIA_ENTRE_PATAS * 0.4)
@@ -385,7 +584,6 @@ func cambiar_estado(nuevo_estado):
 				progreso_movimiento[pata] = 0.0
 		
 		Estado.CORRER_SALTO:
-			# Solo mover patas delanteras - las traseras se quedan donde están
 			var longitud_salto = calcular_longitud_salto_correr()
 			var pos_salto = centro + dir_norm * longitud_salto
 			
@@ -395,33 +593,38 @@ func cambiar_estado(nuevo_estado):
 			objetivos["frontL"].y = obtener_punto_mas_alto(objetivos["frontL"].x, objetivos["frontL"].z, "suelo").y
 			objetivos["frontR"].y = obtener_punto_mas_alto(objetivos["frontR"].x, objetivos["frontR"].z, "suelo").y
 			
-			# Solo resetear el progreso de las patas delanteras
 			for pata in ["frontL", "frontR"]:
 				posiciones_iniciales[pata] = patas[pata]
 				progreso_movimiento[pata] = 0.0
 		
 		Estado.CORRER_ATERRIZAJE:
-			# Mover patas traseras hacia donde están las delanteras
 			objetivos["backL"] = objetivos["frontL"]
 			objetivos["backR"] = objetivos["frontR"]
 			
-			# Solo resetear el progreso de las patas traseras
 			for pata in ["backL", "backR"]:
 				posiciones_iniciales[pata] = patas[pata]
 				progreso_movimiento[pata] = 0.0
 			
 		Estado.SALTO_PREP:
-			var pos_base = centro + dir_norm * (LONGITUD_PASO * 0.5)
-			var positions = {
-				"frontL": pos_base + Vector3(direccion.z, 0, -direccion.x) * (DISTANCIA_ENTRE_PATAS * 0.3),
-				"frontR": pos_base + Vector3(-direccion.z, 0, direccion.x) * (DISTANCIA_ENTRE_PATAS * 0.3),
-				"backL": pos_base + Vector3(direccion.z, 0, -direccion.x) * (DISTANCIA_ENTRE_PATAS * 0.3),
-				"backR": pos_base + Vector3(-direccion.z, 0, direccion.x) * (DISTANCIA_ENTRE_PATAS * 0.3)
-			}
+			var pos_frontL = centro + dir_norm * (LONGITUD_PASO * 0.5)
+			var pos_frontR = Vector3(pos_frontL)
+			var pos_backL = Vector3(pos_frontL)
+			var pos_backR = Vector3(pos_backL)
+						
+			pos_frontL += Vector3(direccion.z, 0, -direccion.x) * (DISTANCIA_ENTRE_PATAS * 0.3)
+			pos_frontR += Vector3(-direccion.z, 0, direccion.x) * (DISTANCIA_ENTRE_PATAS * 0.3)
+			pos_backL += Vector3(direccion.z, 0, -direccion.x) * (DISTANCIA_ENTRE_PATAS * 0.3)
+			pos_backR += Vector3(-direccion.z, 0, direccion.x) * (DISTANCIA_ENTRE_PATAS * 0.3)
 			
-			for pata in positions.keys():
-				positions[pata].y = obtener_punto_mas_alto(positions[pata].x, positions[pata].z, "suelo").y
-				objetivos[pata] = positions[pata]
+			for pos in [pos_frontL, pos_frontR, pos_backL, pos_backR]:
+				pos.y = obtener_punto_mas_alto(pos.x, pos.z, "suelo").y
+			
+			objetivos["frontL"] = pos_frontL
+			objetivos["frontR"] = pos_frontR
+			objetivos["backL"] = pos_backL
+			objetivos["backR"] = pos_backR
+			
+			for pata in patas.keys():
 				posiciones_iniciales[pata] = patas[pata]
 				progreso_movimiento[pata] = 0.0
 		
@@ -431,11 +634,9 @@ func cambiar_estado(nuevo_estado):
 			
 			var pos_base
 			if es_bajada:
-				# Para bajadas: posicionar a un paso del borde para caer cerca
 				pos_base = borde_obstaculo + dir_norm * LONGITUD_PASO
 			else:
-				# Para subidas: aterrizar justo en el borde del obstáculo
-				pos_base = borde_obstaculo
+				pos_base = borde_obstaculo + dir_norm * LONGITUD_PASO * 0.2
 			
 			objetivos["frontL"] = pos_base + Vector3(direccion.z, 0, -direccion.x) * (DISTANCIA_ENTRE_PATAS * 0.5)
 			objetivos["frontR"] = pos_base + Vector3(-direccion.z, 0, direccion.x) * (DISTANCIA_ENTRE_PATAS * 0.5)
@@ -457,33 +658,49 @@ func cambiar_estado(nuevo_estado):
 func es_necesario_saltar():
 	var centro = obtener_centro()
 	var dir_norm = direccion.normalized()
-	var distancia_al_target = distancia(centro, punto_objetivo)
 	
-	if distancia_al_target < LONGITUD_PASO * 2: return false
-	
-	var distancia_necesaria = min(distancia_al_target, UMBRAL_DETECCION_SALTO)
-	
-	for dist in range(1, 40):
-		var distancia_actual = distancia_necesaria * dist / 40.0
-		var punto_check = centro + dir_norm * distancia_actual
-		punto_check.y = centro.y
-		
-		var altura_terreno = obtener_punto_mas_alto(punto_check.x, punto_check.z, "suelo").y
-		var diferencia_altura = altura_terreno - centro.y
-		
-		if diferencia_altura > MIN_HEIGHT_JUMP * 0.7 and diferencia_altura < MAX_HEIGHT_JUMP and distancia_actual < distancia_al_target * 0.8:
-			posicion_obstaculo = Vector3(punto_check.x, altura_terreno, punto_check.z)
-			return true
+	if (debe_avanzar()):
+		for dist in range(1, 30):
+			var distancia_actual = UMBRAL_DETECCION_SALTO * dist / 30.0
+			var punto_check = centro + dir_norm * distancia_actual
+			punto_check.y = centro.y
 			
-		if diferencia_altura < -MIN_HEIGHT_JUMP * 0.7 and diferencia_altura > -MAX_HEIGHT_JUMP * 2 and distancia_actual < distancia_al_target * 0.8:
-			posicion_obstaculo = Vector3(punto_check.x, altura_terreno, punto_check.z)
-			return true
+			var altura_terreno = obtener_punto_mas_alto(punto_check.x, punto_check.z, "suelo").y
+			var diferencia_altura = altura_terreno - centro.y
+			
+			if diferencia_altura > MIN_HEIGHT_JUMP && diferencia_altura < MAX_HEIGHT_JUMP:
+				posicion_obstaculo = Vector3(punto_check.x, altura_terreno, punto_check.z)
+				return true
+				
+			if diferencia_altura < -MIN_HEIGHT_JUMP && diferencia_altura > -MAX_HEIGHT_JUMP * 2 && dist < 10:
+				posicion_obstaculo = Vector3(punto_check.x, altura_terreno, punto_check.z)
+				return true
 	
 	return false
 
 func encontrar_borde_obstaculo():
 	var centro = obtener_centro()
-	var es_bajada = posicion_obstaculo.y < centro.y
+	var dir_norm = direccion.normalized()
+	var es_bajada = false
+	
+	if posicion_obstaculo == Vector3():
+		for dist in range(1, 30):
+			var distancia_actual = UMBRAL_DETECCION_SALTO * dist / 30.0
+			var punto_check = centro + dir_norm * distancia_actual
+			var altura_terreno = obtener_punto_mas_alto(punto_check.x, punto_check.z, "suelo").y
+			var diferencia_altura = altura_terreno - centro.y
+			
+			if diferencia_altura > MIN_HEIGHT_JUMP:
+				posicion_obstaculo = Vector3(punto_check.x, altura_terreno, punto_check.z)
+				es_bajada = false
+				break
+			elif diferencia_altura < -MIN_HEIGHT_JUMP:
+				posicion_obstaculo = Vector3(punto_check.x, altura_terreno, punto_check.z)
+				es_bajada = true
+				break
+	else:
+		es_bajada = posicion_obstaculo.y < centro.y
+	
 	var ultimo_punto_bajo = centro
 	var primer_punto_alto = posicion_obstaculo
 	
@@ -503,8 +720,10 @@ func encontrar_borde_obstaculo():
 			else:
 				ultimo_punto_bajo = punto_medio
 	
-	ultimo_punto_bajo.y = obtener_punto_mas_alto(ultimo_punto_bajo.x, ultimo_punto_bajo.z, "suelo").y
-	return ultimo_punto_bajo
+	var borde = ultimo_punto_bajo
+	borde.y = obtener_punto_mas_alto(borde.x, borde.z, "suelo").y
+	
+	return borde
 
 func todas_patas_en_posicion():
 	return progreso_movimiento.values().all(func(p): return p >= 0.9)
@@ -512,13 +731,11 @@ func todas_patas_en_posicion():
 func todas_patas_en_posicion_correr():
 	return progreso_movimiento.values().all(func(p): return p >= 0.55)
 
-
 func patas_delanteras_en_objetivo():
 	return progreso_movimiento["frontL"] >= 0.9 and progreso_movimiento["frontR"] >= 0.9
 
 func patas_delanteras_en_obj_correr():
 	return progreso_movimiento["frontL"] >= 0.65 and progreso_movimiento["frontR"] >= 0.65
-
 
 func patas_traseras_en_objetivo():
 	return progreso_movimiento["backL"] >= 0.9 and progreso_movimiento["backR"] >= 0.9
@@ -550,13 +767,13 @@ func mover_patas(delta):
 			
 			var factor_altura = 1.0
 			if estado_actual == Estado.SALTO and (nombre == "frontL" or nombre == "frontR"):
-				factor_altura = 0.5 if salto_es_bajada else 2.0
+				factor_altura = 0.5 if salto_es_bajada else 3.0
 			elif estado_actual == Estado.ATERRIZAJE and (nombre == "backL" or nombre == "backR"):
 				factor_altura = 0.5 if salto_es_bajada else 1.2
 			elif estado_actual == Estado.CORRER_SALTO and (nombre == "frontL" or nombre == "frontR"):
-				factor_altura = 1.2  # Salto más bajo para correr
+				factor_altura = 3.0 if salto_es_alto else 1.0
 			elif estado_actual == Estado.CORRER_ATERRIZAJE and (nombre == "backL" or nombre == "backR"):
-				factor_altura = 0.8  # Aterrizaje más rápido
+				factor_altura = 0.8
 			
 			patas[nombre] = calcular_posicion_interpolada(
 				posiciones_iniciales[nombre], 
@@ -566,8 +783,11 @@ func mover_patas(delta):
 			)
 	
 	if not en_ciclo_salto:
-		var velocidad_rot = VELOCIDAD_ROTACION * VELOCIDAD_BASE * 3.0
-		direccion = rotar_hacia(direccion, punto_objetivo, velocidad_rot)
+		var dist = distancia(obtener_centro(), punto_objetivo)
+		if dist > UMBRAL_DISTANCIA * 0.3:  # Umbral mínimo para rotar
+			var factor_velocidad = 2/(0.2*dist)
+			var velocidad_rot = VELOCIDAD_ROTACION * VELOCIDAD_BASE * (1.0 + factor_velocidad)
+			direccion = rotar_hacia(direccion, punto_objetivo, velocidad_rot)
 
 func calcular_posicion_interpolada(pos_inicial, pos_final, progreso, factor_altura = 1.0):
 	var interpolacion_xz = pos_inicial.lerp(pos_final, progreso)
@@ -579,7 +799,28 @@ func calcular_altura_parabola(pos_inicial, pos_final, progreso, factor_altura = 
 	var y_fin = pos_final.y
 	var es_bajada = y_fin < y_inicio - ALTURA_PASO
 	
-	var altura_maxima = max(y_inicio, y_fin) + (ALTURA_PASO * factor_altura * (0.5 if es_bajada else 1.0))
+	var altura_maxima
+	if estado_actual == Estado.SALTO:
+		# Para saltos: altura mínima = altura final + margen de seguridad
+		var altura_objetivo_salto = max(y_inicio, y_fin) + (ALTURA_PASO * factor_altura * 1.0)
+		
+		# Si hay obstáculo detectado, asegurar que pase por encima
+		if posicion_obstaculo != Vector3.ZERO:
+			var altura_obstaculo = posicion_obstaculo.y + (ALTURA_PASO) # Margen extra
+			altura_objetivo_salto = max(altura_objetivo_salto, altura_obstaculo)
+		
+		altura_maxima = altura_objetivo_salto
+	elif estado_actual == Estado.CORRER_SALTO:
+		# Para saltos: altura mínima = altura final + margen de seguridad
+		var altura_objetivo_salto = max(y_inicio, y_fin) + (ALTURA_PASO * factor_altura * 1.0)
+		
+		altura_maxima = altura_objetivo_salto
+	else:
+		# Para pasos normales (como antes)
+		if es_bajada:
+			altura_maxima = y_inicio + (ALTURA_PASO * factor_altura * 0.5)
+		else:
+			altura_maxima = max(y_inicio, y_fin) + (ALTURA_PASO * factor_altura)
 	
 	var a = y_inicio + y_fin - 2 * altura_maxima
 	var b = -2 * y_inicio + 2 * altura_maxima
@@ -594,7 +835,9 @@ func actualizar_representacion_visual():
 	esferas["punto_objetivo"].position = punto_objetivo
 
 func debe_avanzar():
-	return distancia(obtener_centro(), punto_objetivo) > UMBRAL_DISTANCIA * 0.5
+	var dist = distancia(obtener_centro(), punto_objetivo)
+	var umbral_descanso = UMBRAL_DISTANCIA
+	return dist > umbral_descanso
 
 func distancia(p1, p2):
 	return Vector2(p1.x - p2.x, p1.z - p2.z).length()
@@ -625,89 +868,19 @@ func rotar_hacia(actual, objetivo, angulo_max):
 func calcular_siguiente_posicion_delantera(izquierda):
 	var dir_norm = direccion.normalized()
 	var centro = obtener_centro()
-	var factor_paso = clamp(VELOCIDAD_BASE / 1.2, 1.0, 1.2)
+	var factor_paso = max(min(VELOCIDAD_BASE / 1.2, 1.2), 1)
 	
-	var pos_ideal = centro + dir_norm * LONGITUD_PASO * factor_paso
-	pos_ideal += Vector3(direccion.z, 0, -direccion.x) * (DISTANCIA_ENTRE_PATAS / 2) * (1 if izquierda else -1)
+	var pos = centro + dir_norm * LONGITUD_PASO * factor_paso
 	
-	var altura_ideal = obtener_punto_mas_alto(pos_ideal.x, pos_ideal.z, "suelo").y
-	pos_ideal.y = altura_ideal
-	
-	var nombre_pata = "frontL" if izquierda else "frontR"
-	var altura_actual = patas[nombre_pata].y
-	var diferencia_altura = abs(altura_ideal - altura_actual)
-	
-	if diferencia_altura <= UMBRAL_ALTURA_SUTIL:
-		return pos_ideal
-	
-	if diferencia_altura >= UMBRAL_ALTURA_CRITICA:
-		var mejor_posicion = buscar_mejor_posicion_pata(pos_ideal, altura_actual)
-		if mejor_posicion != Vector3.ZERO:
-			return mejor_posicion
-	
-	return pos_ideal
-
-func buscar_mejor_posicion_pata(pos_ideal: Vector3, altura_actual: float) -> Vector3:
-	var mejor_posicion = pos_ideal
-	var mejor_puntuacion = evaluar_posicion_pata(pos_ideal, pos_ideal, altura_actual)
-	
-	var centro = obtener_centro()
-	var dir_objetivo = (punto_objetivo - centro).normalized()
-	var angulo_base = atan2(dir_objetivo.z, dir_objetivo.x)
-	var apertura_rad = deg_to_rad(60.0)
-	
-	for i in range(PUNTOS_BUSQUEDA):
-		var factor = (i / float(PUNTOS_BUSQUEDA - 1)) - 0.5
-		var angulo = angulo_base + factor * apertura_rad
-		var offset_x = cos(angulo) * RADIO_BUSQUEDA_PATA
-		var offset_z = sin(angulo) * RADIO_BUSQUEDA_PATA
-		
-		var pos_candidata = Vector3(pos_ideal.x + offset_x, 0, pos_ideal.z + offset_z)
-		pos_candidata.y = obtener_punto_mas_alto(pos_candidata.x, pos_candidata.z, "suelo").y
-		
-		var puntuacion = evaluar_posicion_pata(pos_candidata, pos_ideal, altura_actual)
-		
-		if puntuacion > mejor_puntuacion:
-			mejor_posicion = pos_candidata
-			mejor_puntuacion = puntuacion
-	
-	return mejor_posicion if mejor_puntuacion > evaluar_posicion_pata(pos_ideal, pos_ideal, altura_actual) + 0.1 else Vector3.ZERO
-
-func evaluar_posicion_pata(pos_candidata: Vector3, pos_ideal: Vector3, altura_actual: float) -> float:
-	var distancia_ideal = Vector2(pos_candidata.x - pos_ideal.x, pos_candidata.z - pos_ideal.z).length()
-	var factor_distancia = 1.0 - min(distancia_ideal / RADIO_BUSQUEDA_PATA, 1.0)
-	
-	var diferencia_altura = abs(pos_candidata.y - altura_actual)
-	var factor_altura = 1.0 - min(diferencia_altura / UMBRAL_ALTURA_CRITICA, 1.0)
-	
-	var factor_seguridad = evaluar_seguridad_posicion(pos_candidata, altura_actual)
-	var factor_alcance = evaluar_alcance_pata(pos_candidata)
-	
-	return (factor_distancia * PESO_DISTANCIA + factor_altura * PESO_ALTURA + factor_seguridad * 0.3 + factor_alcance * 0.2)
-
-func evaluar_seguridad_posicion(pos: Vector3, altura_actual: float) -> float:
-	var diferencia_altura = pos.y - altura_actual
-	
-	if diferencia_altura < -UMBRAL_ALTURA_CRITICA * 1.5:
-		return 0.0
-	elif diferencia_altura < -UMBRAL_ALTURA_CRITICA:
-		return 0.3
-	elif diferencia_altura > UMBRAL_ALTURA_CRITICA:
-		return 0.7
+	if izquierda:
+		pos += Vector3(direccion.z, 0, -direccion.x) * (DISTANCIA_ENTRE_PATAS / 2)
 	else:
-		return 1.0
-
-func evaluar_alcance_pata(pos: Vector3) -> float:
-	var centro = obtener_centro()
-	var distancia_centro = Vector2(pos.x - centro.x, pos.z - centro.z).length()
-	var alcance_maximo = LONGITUD_PASO * 1.3
+		pos += Vector3(-direccion.z, 0, direccion.x) * (DISTANCIA_ENTRE_PATAS / 2)
 	
-	if distancia_centro > alcance_maximo:
-		return 0.0
-	elif distancia_centro > LONGITUD_PASO:
-		return 0.5
-	else:
-		return 1.0
+	var altura_terreno = obtener_punto_mas_alto(pos.x, pos.z, "suelo").y
+
+	pos.y = obtener_punto_mas_alto(pos.x, pos.z, "suelo").y
+	return pos
 
 func obtener_patas():
 	return patas

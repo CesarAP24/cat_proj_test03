@@ -1,20 +1,22 @@
-
 extends Node3D
 
 @export var objetivo_path: NodePath
 @export var offset_y: float
+
 
 @onready var objetivo = get_node(objetivo_path)
 @onready var t_backL = $metarig/t_backL
 @onready var t_backR = $metarig/t_backR
 @onready var t_frontL = $metarig/t_frontL
 @onready var t_frontR = $metarig/t_frontR
+@onready var t_tail = $metarig/t_tail
 @onready var ik_backL = $metarig/Skeleton3D/ik_backL
 @onready var ik_backL2 = $metarig/Skeleton3D/ik_backL2
 @onready var ik_backR = $metarig/Skeleton3D/ik_backR
 @onready var ik_backR2 = $metarig/Skeleton3D/ik_backR2
 @onready var ik_frontL = $metarig/Skeleton3D/ik_frontL
 @onready var ik_frontR = $metarig/Skeleton3D/ik_frontR
+@onready var ik_tail = $metarig/Skeleton3D/ik_tail
 @export var spring_stiffness: float = 250.0  # Controls how strongly the spring pulls
 @export var spring_damping: float = 15  # Controls how quickly oscillations settle
 @export var mass: float = 1.0             # Simulated mass of the head
@@ -45,12 +47,22 @@ func update_root_pos_rot():
 	var angle_y = atan2(dir.x, dir.z)
 	global_transform.basis = Basis(Vector3.UP, angle_y)
 
-func update_targets_pos():
+@export var VELOCIDAD_SUAVIZADO_COLA = 8.0  # Qué tan rápido sigue la cola
+@export var DISTANCIA_MINIMA_COLA = 0.1     # Distancia mínima para considerar "llegó"
+
+func update_targets_pos(delta):
 	var patas = objetivo.call("obtener_patas")
+	var cola_objetivo = objetivo.call("obtener_posicion_cola")
+	
+	# Patas se mueven instantáneamente (como antes)
 	t_backL.global_position = patas["backL"]
 	t_backR.global_position = patas["backR"]
 	t_frontL.global_position = patas["frontL"]
 	t_frontR.global_position = patas["frontR"]
+	
+	# Cola se mueve suavemente con lerp
+	var factor_lerp = VELOCIDAD_SUAVIZADO_COLA * delta
+	t_tail.global_position = t_tail.global_position.lerp(cola_objetivo, factor_lerp)
 
 
 
@@ -157,6 +169,7 @@ func _ready():
 	ik_frontR.start()
 	ik_backL2.start()
 	ik_backR2.start()
+	ik_tail.start()
 	
 	for name in column_bones:
 		var current_bone = hueso.find_bone(name)
@@ -188,7 +201,7 @@ func _process(delta):
 		helper -= 0.1
 		
 	# Limpiar geometría anterior
-	update_targets_pos()
+	update_targets_pos(delta)
 	update_column(hueso, column_bones, get_target_pos(), delta)
 	update_magnet_pos()
 	

@@ -1,19 +1,18 @@
-[gd_scene load_steps=11 format=3 uid="uid://bs6r5b78pl80i"]
+[gd_scene load_steps=10 format=3 uid="uid://bs6r5b78pl80i"]
 
 [ext_resource type="Script" uid="uid://c0kae6f0h1cyc" path="res://scripts/main.gd" id="1_mrabx"]
 [ext_resource type="Script" uid="uid://di8sk7kmiq0wr" path="res://scripts/audio_listener_3d.gd" id="2_4rhi5"]
 [ext_resource type="Script" uid="uid://cyykjr8fvts8h" path="res://scripts/Camera.gd" id="2_v4jus"]
-[ext_resource type="PackedScene" uid="uid://b8hniu3f6w3v0" path="res://scenes/cat_model.tscn" id="3_4rhi5"]
 [ext_resource type="PackedScene" uid="uid://cppicxpa1x7l5" path="res://scenes/black_model.tscn" id="4_4rhi5"]
 [ext_resource type="PackedScene" uid="uid://cw6xnniivw4rx" path="res://scenes/salsa_dancing.tscn" id="4_osey5"]
 
-[sub_resource type="Sky" id="6"]
+[sub_resource type="Sky" id="Sky_nij2p"]
 
 [sub_resource type="Environment" id="1"]
 background_mode = 1
 background_color = Color(0.360784, 0.360784, 0.360784, 1)
 background_energy_multiplier = 0.66
-sky = SubResource("6")
+sky = SubResource("Sky_nij2p")
 ambient_light_color = Color(1, 1, 1, 1)
 ambient_light_energy = 0.0
 fog_enabled = true
@@ -58,13 +57,6 @@ angulo = 35.0
 invertir_x = true
 
 [node name="black_model" parent="." instance=ExtResource("4_4rhi5")]
-objetivo_path = NodePath("..")
-offset_y = 7.0
-spring_stiffness = 400.0
-spring_damping = 30.0
-
-[node name="cat_model" parent="." instance=ExtResource("3_4rhi5")]
-visible = false
 objetivo_path = NodePath("..")
 offset_y = 7.0
 spring_stiffness = 400.0
