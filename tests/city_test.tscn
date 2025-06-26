@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://4j4maeatft45"]
 
-[ext_resource type="PackedScene" uid="uid://cppicxpa1x7l5" path="res://scenes/black_model.tscn" id="1_iet0h"]
+[ext_resource type="PackedScene" uid="uid://cppicxpa1x7l5" path="res://assets/black_model.tscn" id="1_iet0h"]
 [ext_resource type="Script" uid="uid://c0kae6f0h1cyc" path="res://scripts/main.gd" id="1_lkicp"]
 [ext_resource type="Script" uid="uid://dxxdsf8mh3cci" path="res://scripts/CityGenerator.gd" id="2_lkicp"]
 [ext_resource type="Script" uid="uid://cyykjr8fvts8h" path="res://scripts/Camera.gd" id="3_n5rus"]
@@ -17,7 +17,7 @@ ambient_light_energy = 0.0
 fog_enabled = true
 fog_density = 0.0
 volumetric_fog_enabled = true
-volumetric_fog_density = 0.02
+volumetric_fog_density = 0.005
 
 [node name="CityTest" type="Node3D"]
 script = ExtResource("1_lkicp")
@@ -28,7 +28,10 @@ script = ExtResource("2_lkicp")
 render_distance = 8
 avenue_padding = 5.0
 block_padding = 3.0
+lot_size = 50
 stability_threshold = 100.0
+mesh_generation_distance = 150.0
+show_debug_overlay = false
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(0.999964, -0.00224809, 0.00812667, -0.0052107, 0.592981, 0.8052, -0.00662912, -0.805213, 0.592948, 0, 36.7529, 5.87417)

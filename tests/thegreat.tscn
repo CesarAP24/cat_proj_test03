@@ -1,0 +1,86 @@
+[gd_scene load_steps=7 format=3 uid="uid://bo8uivitiwryg"]
+
+[ext_resource type="Script" uid="uid://c0kae6f0h1cyc" path="res://scripts/main.gd" id="1_5jofc"]
+[ext_resource type="Script" uid="uid://cyykjr8fvts8h" path="res://scripts/Camera.gd" id="2_ie6gf"]
+[ext_resource type="PackedScene" uid="uid://cppicxpa1x7l5" path="res://assets/black_model.tscn" id="3_upce8"]
+[ext_resource type="PackedScene" uid="uid://bcp8eepbyfgpv" path="res://assets/thegreatScene.tscn" id="4_lgwkj"]
+
+[sub_resource type="Sky" id="6"]
+
+[sub_resource type="Environment" id="Environment_snnre"]
+background_mode = 1
+background_color = Color(0.360784, 0.360784, 0.360784, 1)
+background_energy_multiplier = 0.66
+sky = SubResource("6")
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 0.0
+fog_enabled = true
+fog_density = 0.0
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.02
+
+[node name="CityTest" type="Node3D"]
+script = ExtResource("1_5jofc")
+camara_path = NodePath("Camera3D")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.999964, -0.00224809, 0.00812667, -0.0052107, 0.592981, 0.8052, -0.00662912, -0.805213, 0.592948, 0, 36.7529, 5.87417)
+environment = SubResource("Environment_snnre")
+current = true
+fov = 82.6
+near = 0.1
+script = ExtResource("2_ie6gf")
+objetivo_path = NodePath("..")
+distancia = 30.0
+altura = 10.0
+angulo = 35.0
+invertir_x = true
+zoom_max = 5000.0
+zoom_speed = 0.8
+velocidad_suavizado = 7.0
+
+[node name="black_model" parent="." instance=ExtResource("3_upce8")]
+objetivo_path = NodePath("..")
+offset_y = 7.0
+spring_stiffness = 400.0
+spring_damping = 30.0
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+light_energy = 15.335
+shadow_enabled = true
+omni_range = 470.883
+
+[node name="Sketchfab_Scene" parent="." instance=ExtResource("4_lgwkj")]
+transform = Transform3D(30, 0, 0, 0, 30, 0, 0, 0, 30, 0, -14.0028, 0)
+
+[node name="OmniLight3D2" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.87434, -0.485313, 0, 0.485313, 0.87434, -69.1385, 78.8236, 70.3581)
+light_energy = 22.772
+light_volumetric_fog_energy = 0.0
+shadow_enabled = true
+distance_fade_enabled = true
+omni_range = 416.849
+
+[node name="OmniLight3D3" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.87434, -0.485313, 0, 0.485313, 0.87434, -108.335, 78.8236, 24.3673)
+light_energy = 22.772
+light_volumetric_fog_energy = 0.0
+shadow_enabled = true
+distance_fade_enabled = true
+omni_range = 416.849
+
+[node name="OmniLight3D4" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.87434, -0.485313, 0, 0.485313, 0.87434, 59.3259, 78.8236, -48.5854)
+light_energy = 22.772
+light_volumetric_fog_energy = 0.0
+shadow_enabled = true
+distance_fade_enabled = true
+omni_range = 416.849
+
+[node name="OmniLight3D5" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.87434, -0.485313, 0, 0.485313, 0.87434, 20.1289, 78.8236, -94.5762)
+light_energy = 22.772
+light_volumetric_fog_energy = 0.0
+shadow_enabled = true
+distance_fade_enabled = true
+omni_range = 416.849
