@@ -35,8 +35,8 @@ var camara: Camera3D
 @export var PESO_DISTANCIA = 0.3
 @export var PESO_ALTURA = 0.7
 @export var DISTANCIA_MAXIMA_PATA = 300 * ESCALA
-@export var DISTANCIA_PARA_CORRER = 1500 * ESCALA
-@export var DISTANCIA_PARAR_CORRER = 1000 * ESCALA
+@export var DISTANCIA_PARA_CORRER = 1000 * ESCALA
+@export var DISTANCIA_PARAR_CORRER = 600 * ESCALA
 @export var SALTO_CORRER_MAX = 400 * ESCALA
 @export var SALTO_CORRER_MIN = 180 * ESCALA
 @export var VELOCIDAD_CORRER = 1
@@ -340,9 +340,11 @@ class RunBehavior extends BaseBehavior:
 				if context.todas_patas_en_posicion_correr():
 					context.cambiar_estado(Estado.CORRER_SALTO)
 			Estado.CORRER_SALTO:
+				context.salto_es_alto = (context.posicion_obstaculo.y - context.obtener_centro().y) > 4
 				if context.patas_delanteras_en_obj_correr():
 					context.cambiar_estado(Estado.CORRER_ATERRIZAJE)
 			Estado.CORRER_ATERRIZAJE:
+				context.salto_es_alto = (context.posicion_obstaculo.y - context.obtener_centro().y) > 4
 				if context.patas_traseras_en_obj_correr():
 					dist_target = context.distancia(context.obtener_centro(), context.punto_objetivo)
 					if dist_target < context.DISTANCIA_PARAR_CORRER:
@@ -455,11 +457,27 @@ func crear_material(color):
 	mat.albedo_color = color
 	return mat
 
+
+@export var DISTANCIA_MINIMA_CAMINAR = 270 * ESCALA  # Distancia mínima para mantener caminando
+@export var DISTANCIA_MINIMA_CORRER = 100 * ESCALA  # Distancia mínima para mantener corriendo
+@export var VELOCIDAD_ACERCAMIENTO = 2  # Velocidad con la que el target se acerca al gato
+@export var RADIO_MUERTO_INPUT = 0.05  # Umbral mínimo para detectar input
+
+var input_activo = false
+var ultimo_input_time = 0.0
+var tiempo_sin_input = 0.0
+
 func manejar_movimiento_objetivo():
-	# Verificar si Shift está presionado para cambiar la velocidad
-	var velocidad_multiplicador = 4.0 if Input.is_key_pressed(KEY_SHIFT) else 1.5
+	var delta = get_process_delta_time()
+	
+	# Verificar si Shift está presionado para cambiar entre caminar/correr
+	var modo_correr = Input.is_key_pressed(KEY_SHIFT)
+	var velocidad_multiplicador = 9.0 if modo_correr else 2.0
 	var velocidad_objetivo = 0.2 * 2 * velocidad_multiplicador
+	
+	# Detectar ESPECÍFICAMENTE las teclas de movimiento WASD
 	var input_dir = Vector3.ZERO
+	var teclas_movimiento_presionadas = false
 	
 	if camara:
 		var orientacion_camara = -camara.global_transform.basis.z
@@ -469,20 +487,110 @@ func manejar_movimiento_objetivo():
 		derecha_camara.y = 0
 		derecha_camara = derecha_camara.normalized()
 		
-		if Input.is_key_pressed(KEY_W): input_dir += orientacion_camara
-		if Input.is_key_pressed(KEY_S): input_dir -= orientacion_camara
-		if Input.is_key_pressed(KEY_D): input_dir += derecha_camara
-		if Input.is_key_pressed(KEY_A): input_dir -= derecha_camara
+		if Input.is_key_pressed(KEY_W): 
+			input_dir += orientacion_camara
+			teclas_movimiento_presionadas = true
+		if Input.is_key_pressed(KEY_S): 
+			input_dir -= orientacion_camara
+			teclas_movimiento_presionadas = true
+		if Input.is_key_pressed(KEY_D): 
+			input_dir += derecha_camara
+			teclas_movimiento_presionadas = true
+		if Input.is_key_pressed(KEY_A): 
+			input_dir -= derecha_camara
+			teclas_movimiento_presionadas = true
 	else:
-		if Input.is_key_pressed(KEY_W): input_dir.z += 1
-		if Input.is_key_pressed(KEY_A): input_dir.x += 1
-		if Input.is_key_pressed(KEY_S): input_dir.z -= 1
-		if Input.is_key_pressed(KEY_D): input_dir.x -= 1
+		if Input.is_key_pressed(KEY_W): 
+			input_dir.z += 1
+			teclas_movimiento_presionadas = true
+		if Input.is_key_pressed(KEY_A): 
+			input_dir.x += 1
+			teclas_movimiento_presionadas = true
+		if Input.is_key_pressed(KEY_S): 
+			input_dir.z -= 1
+			teclas_movimiento_presionadas = true
+		if Input.is_key_pressed(KEY_D): 
+			input_dir.x -= 1
+			teclas_movimiento_presionadas = true
 	
-	if input_dir.length() > 0.1:
-		punto_objetivo += input_dir.normalized() * velocidad_objetivo
+	# Solo considerar input válido si hay teclas de movimiento presionadas Y hay dirección
+	var hay_input_movimiento = teclas_movimiento_presionadas and input_dir.length() > RADIO_MUERTO_INPUT
 	
+	if hay_input_movimiento:
+		input_activo = true
+		ultimo_input_time = 0.0
+		tiempo_sin_input = 0.0
+		
+		# Mover el target según input del jugador
+		mover_target_con_input(input_dir, velocidad_objetivo, modo_correr)
+	else:
+		# Solo acercar si anteriormente había input activo de movimiento
+		# (es decir, se soltaron las teclas de movimiento)
+		if input_activo:
+			ultimo_input_time += delta
+			tiempo_sin_input += delta
+			input_activo = false
+			
+			# Acercar gradualmente el target al gato
+			acercar_target_al_gato(modo_correr)
+		# Si nunca hubo input activo, no hacer nada (mantener posición)
+	
+	# Mantener altura del target
 	punto_objetivo.y = obtener_centro().y + 3
+
+func mover_target_con_input(input_dir: Vector3, velocidad: float, modo_correr: bool):
+	# Calcular nueva posición del target
+	var nueva_posicion = punto_objetivo + input_dir.normalized() * velocidad
+	
+	# Determinar distancia mínima según el modo
+	var distancia_minima = DISTANCIA_MINIMA_CORRER if modo_correr else DISTANCIA_MINIMA_CAMINAR
+	
+	# Validar que el target mantenga la distancia mínima
+	punto_objetivo = validar_distancia_minima(nueva_posicion, distancia_minima)
+
+func acercar_target_al_gato(modo_correr: bool):
+	var centro_gato = obtener_centro()
+	var distancia_actual = distancia(punto_objetivo, centro_gato)
+	
+	# Determinar distancia objetivo según el modo
+	var distancia_objetivo
+	if modo_correr:
+		distancia_objetivo = DISTANCIA_MINIMA_CORRER
+	else:
+		distancia_objetivo = DISTANCIA_MINIMA_CAMINAR
+	
+	# Solo acercar si está más lejos de la distancia objetivo
+	if distancia_actual > distancia_objetivo:
+		# Calcular dirección hacia el gato
+		var direccion_hacia_gato = (centro_gato - punto_objetivo).normalized()
+		
+		# Calcular velocidad de acercamiento (más rápido si está muy lejos)
+		var factor_distancia = clamp(distancia_actual / distancia_objetivo, 1.0, 3.0)
+		var velocidad_acercamiento = VELOCIDAD_ACERCAMIENTO * factor_distancia
+		
+		# Mover el target hacia el gato
+		var nueva_posicion = punto_objetivo + direccion_hacia_gato * velocidad_acercamiento
+		
+		# Asegurar que no se acerque demasiado
+		punto_objetivo = validar_distancia_minima(nueva_posicion, distancia_objetivo)
+
+func validar_distancia_minima(nueva_posicion: Vector3, distancia_minima: float) -> Vector3:
+	var centro_gato = obtener_centro()
+	var distancia_nueva = distancia(nueva_posicion, centro_gato)
+	
+	# Si la nueva posición está muy cerca, mantener en el perímetro mínimo
+	if distancia_nueva < distancia_minima:
+		var direccion_desde_gato = (nueva_posicion - centro_gato).normalized()
+		
+		# Si la dirección es inválida (posiciones idénticas), usar dirección actual
+		if direccion_desde_gato.length() < 0.1:
+			direccion_desde_gato = (punto_objetivo - centro_gato).normalized()
+			if direccion_desde_gato.length() < 0.1:
+				direccion_desde_gato = Vector3(0, 0, 1)  # Dirección por defecto
+		
+		nueva_posicion = centro_gato + direccion_desde_gato * distancia_minima
+	
+	return nueva_posicion
 
 func set_target(new_target):
 	punto_objetivo = new_target
@@ -744,7 +852,7 @@ func patas_traseras_en_obj_correr():
 	return progreso_movimiento["backL"] >= 0.57 and progreso_movimiento["backR"] >= 0.57
 
 func obtener_progreso_suave(x):
-	return 1 / (1 + exp(-8 * (x - 0.5)))
+	return x * x * (3.0 - 2.0 * x)
 
 func mover_patas(delta):
 	tiempo += delta * VELOCIDAD_MOVIMIENTO * VELOCIDAD_BASE
@@ -781,12 +889,13 @@ func mover_patas(delta):
 				obtener_progreso_suave(progreso_movimiento[nombre]), 
 				factor_altura
 			)
+			
 	
 	if not en_ciclo_salto:
 		var dist = distancia(obtener_centro(), punto_objetivo)
 		if dist > UMBRAL_DISTANCIA * 0.3:  # Umbral mínimo para rotar
-			var factor_velocidad = 2/(0.2*dist)
-			var velocidad_rot = VELOCIDAD_ROTACION * VELOCIDAD_BASE * (1.0 + factor_velocidad)
+			var factor_velocidad = 1/(0.2*dist)
+			var velocidad_rot = max(VELOCIDAD_ROTACION * VELOCIDAD_BASE * (1.0 + factor_velocidad), VELOCIDAD_ROTACION*VELOCIDAD_BASE*1.3)
 			direccion = rotar_hacia(direccion, punto_objetivo, velocidad_rot)
 
 func calcular_posicion_interpolada(pos_inicial, pos_final, progreso, factor_altura = 1.0):
@@ -902,3 +1011,40 @@ func obtener_punto_mas_alto(x, z, grupo_nombre):
 			return resultado["position"]
 	
 	return Vector3(x, 0, z)
+
+func validar_posicion_anatomica(pos_nueva: Vector3, nombre_pata: String) -> Vector3:
+	var centro = obtener_centro()
+	var pos_validada = pos_nueva
+	
+	# Determinar lado (izquierdo/derecho) y tipo (delantero/trasero)
+	var es_izquierda = nombre_pata.find("L") != -1
+	var es_delantera = nombre_pata.find("front") != -1
+	
+	# Calcular posición mínima y máxima permitida según la anatomía
+	var lateral_min = -DISTANCIA_ENTRE_PATAS * 1.5
+	var lateral_max = DISTANCIA_ENTRE_PATAS * 1.5
+	
+	# Vector lateral basado en la dirección actual
+	var vector_lateral = Vector3(direccion.z, 0, -direccion.x).normalized()
+	var proyeccion_lateral = (pos_nueva - centro).dot(vector_lateral)
+	
+	# Validar que las patas no se crucen
+	if es_izquierda and proyeccion_lateral < -DISTANCIA_ENTRE_PATAS * 0.3:
+		# Pata izquierda muy hacia la derecha - corregir
+		pos_validada = centro + vector_lateral * (-DISTANCIA_ENTRE_PATAS * 0.3)
+		pos_validada += (direccion.normalized() * (pos_nueva - centro).dot(direccion.normalized()))
+	elif not es_izquierda and proyeccion_lateral > DISTANCIA_ENTRE_PATAS * 0.3:
+		# Pata derecha muy hacia la izquierda - corregir
+		pos_validada = centro + vector_lateral * (DISTANCIA_ENTRE_PATAS * 0.3)
+		pos_validada += (direccion.normalized() * (pos_nueva - centro).dot(direccion.normalized()))
+	
+	# Validar distancia máxima del centro
+	var dist_centro = Vector2(pos_validada.x - centro.x, pos_validada.z - centro.z).length()
+	if dist_centro > DISTANCIA_MAXIMA_PATA:
+		var dir_hacia_pata = (pos_validada - centro).normalized()
+		pos_validada = centro + dir_hacia_pata * DISTANCIA_MAXIMA_PATA
+	
+	# Asegurar altura correcta del terreno
+	pos_validada.y = obtener_punto_mas_alto(pos_validada.x, pos_validada.z, "suelo").y
+	
+	return pos_validada

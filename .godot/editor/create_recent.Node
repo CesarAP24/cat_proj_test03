@@ -1,6 +1,7 @@
+CSGSphere3D
+AspectRatioContainer
 OmniLight3D
 MeshInstance3D
-CSGSphere3D
 DirectionalLight3D
 Node3D
 Fur

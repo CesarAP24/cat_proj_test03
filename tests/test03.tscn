@@ -1,23 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://dkpedmbd384id"]
+[gd_scene load_steps=9 format=3 uid="uid://dkpedmbd384id"]
 
 [ext_resource type="Script" uid="uid://c0kae6f0h1cyc" path="res://scripts/main.gd" id="1_mrabx"]
 [ext_resource type="Script" uid="uid://di8sk7kmiq0wr" path="res://scripts/audio_listener_3d.gd" id="2_4rhi5"]
 [ext_resource type="Script" uid="uid://cyykjr8fvts8h" path="res://scripts/Camera.gd" id="2_v4jus"]
 [ext_resource type="PackedScene" uid="uid://cppicxpa1x7l5" path="res://assets/black_model.tscn" id="4_4rhi5"]
 [ext_resource type="PackedScene" uid="uid://cw6xnniivw4rx" path="res://assets/salsa_dancing.tscn" id="4_osey5"]
-
-[sub_resource type="Sky" id="Sky_nij2p"]
-
-[sub_resource type="Environment" id="1"]
-background_mode = 1
-background_color = Color(0.360784, 0.360784, 0.360784, 1)
-background_energy_multiplier = 0.66
-sky = SubResource("Sky_nij2p")
-ambient_light_color = Color(1, 1, 1, 1)
-ambient_light_energy = 0.0
-fog_enabled = true
-volumetric_fog_enabled = true
-volumetric_fog_density = 0.02
+[ext_resource type="PackedScene" uid="uid://c848apq8wl1vb" path="res://assets/cielo/Cycle.tscn" id="6_kva37"]
 
 [sub_resource type="BoxShape3D" id="2"]
 
@@ -34,18 +22,8 @@ current = true
 script = ExtResource("2_4rhi5")
 objetivo_path = NodePath("..")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.196153, 0.859778, 0.471494, -0.557627, -0.297711, 0.774868, 0.806583, -0.41491, 0.421038, -0.0548689, 51.2257, -13.7786)
-light_color = Color(0.97, 0.965473, 0.9021, 1)
-light_energy = 0.688
-light_indirect_energy = 0.638
-light_volumetric_fog_energy = 0.192
-shadow_enabled = true
-directional_shadow_max_distance = 1434.7
-
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(0.999964, -0.00224809, 0.00812667, -0.0052107, 0.592981, 0.8052, -0.00662912, -0.805213, 0.592948, 0, 36.7529, 5.87417)
-environment = SubResource("1")
 current = true
 fov = 82.6
 near = 0.1
@@ -283,3 +261,5 @@ light_energy = 16.0
 light_volumetric_fog_energy = 4.717
 spot_range = 74.7805
 spot_angle = 29.4748
+
+[node name="Node3D2" parent="." instance=ExtResource("6_kva37")]
