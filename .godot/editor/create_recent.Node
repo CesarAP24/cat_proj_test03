@@ -1,11 +1,11 @@
 MeshInstance3D
+DirectionalLight3D
 CSGSphere3D
+SpotLight3D
 AspectRatioContainer
 OmniLight3D
-DirectionalLight3D
 Node3D
 Fur
 Camera3D
 AudioListener3D
 AudioStreamPlayer3D
-SpotLight3D

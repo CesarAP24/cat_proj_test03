@@ -3,6 +3,7 @@ res://tests/city_test.tscn
 res://addons/so_fluffy/turbulence_default.tres
 res://addons/so_fluffy/so_fluffy.gdshader
 res://materials/roof_material.tres
+res://materials/wall2_material.tres
 res://assets/cielo/stylized-sky.gdshader
 res://assets/cielo/DayNightCycle.tscn
 res://assets/cielo/Day.tscn
@@ -11,5 +12,11 @@ res://tests/test03.tscn
 res://tests/abandoned.tscn
 res://assets/black_model.tscn
 res://escena.tscn
-res://scripts/CityHandler/Utils/BuildingMeshGenerator.gd
+res://scripts/main.gd
+res://assets/cielo/Night.tscn
+res://scripts/CityHandler/ManzanaManager.gd
+res://scripts/CityHandler/Utils/PolygonSubdivider.gd
 res://scripts/HouseGenerator/HouseBuilder.gd
+res://materials/window_material.tres
+res://materials/wall_material.tres
+res://scripts/CityHandler/CityGeneratorV3.gd

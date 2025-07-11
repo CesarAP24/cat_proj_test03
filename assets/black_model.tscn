@@ -1,20 +1,7 @@
-[gd_scene load_steps=8 format=3 uid="uid://cppicxpa1x7l5"]
+[gd_scene load_steps=3 format=3 uid="uid://cppicxpa1x7l5"]
 
 [ext_resource type="PackedScene" uid="uid://b2dit4nr8wf6o" path="res://assets/black.glb" id="1_3ah2f"]
 [ext_resource type="Script" uid="uid://jcoxxws3n8i1" path="res://scripts/targets_cat.gd" id="2_o73ox"]
-[ext_resource type="Texture2D" uid="uid://gul2867c2h8b" path="res://assets/black_negris.jpg" id="4_5bkid"]
-[ext_resource type="Script" uid="uid://4hkhkxys7no3" path="res://addons/so_fluffy/so_fluffy.gd" id="5_nbt42"]
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_30hqb"]
-frequency = 0.0095
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_66wr3"]
-as_normal_map = true
-noise = SubResource("FastNoiseLite_30hqb")
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_h3u1d"]
-as_normal_map = true
-noise = SubResource("FastNoiseLite_30hqb")
 
 [node name="black" instance=ExtResource("1_3ah2f")]
 script = ExtResource("2_o73ox")
@@ -30,20 +17,6 @@ script = ExtResource("2_o73ox")
 [node name="t_tail" type="Marker3D" parent="metarig" index="5"]
 
 [node name="t_tail2" type="Marker3D" parent="metarig" index="6"]
-
-[node name="Fur" type="Node" parent="metarig/Skeleton3D/Cube_001" index="0"]
-script = ExtResource("5_nbt42")
-number_of_shells = 256
-length = 0.05
-density = 2.3
-seed = 100654
-scruffiness = 4.0
-turbulence_texture = SubResource("NoiseTexture2D_66wr3")
-jitter_texture = SubResource("NoiseTexture2D_h3u1d")
-albedo_color = Color(0.788477, 0.900797, 0.937889, 1)
-albedo_texture = ExtResource("4_5bkid")
-physics_enabled = false
-metadata/_custom_type_script = "uid://4hkhkxys7no3"
 
 [node name="ik_backL" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="1"]
 process_priority = 1

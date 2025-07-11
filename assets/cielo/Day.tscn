@@ -68,7 +68,8 @@ ambient_light_sky_contribution = 0.0
 ambient_light_energy = 0.2
 tonemap_mode = 2
 glow_enabled = true
-volumetric_fog_density = 0.001
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.0
 adjustment_enabled = true
 adjustment_brightness = 1.33
 adjustment_saturation = 1.5
@@ -77,8 +78,3 @@ adjustment_saturation = 1.5
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_r3fl7")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.857048, -0.356717, 0.371781, 0.124373, 0.557003, 0.821145, -0.5, 0.75, -0.433013, 0, 0, 0)
-light_energy = 0.18
-shadow_enabled = true

@@ -14,5 +14,4 @@ normal_texture = ExtResource("4_f5uma")
 ao_enabled = true
 ao_light_affect = 0.21
 ao_texture = ExtResource("2_1gli4")
-heightmap_enabled = true
 heightmap_texture = ExtResource("3_pjdv2")

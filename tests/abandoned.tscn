@@ -44,15 +44,25 @@ velocidad_suavizado = 7.0
 objetivo_path = NodePath("..")
 offset_y = 7.0
 spring_stiffness = 400.0
-spring_damping = 30.0
+spring_damping = 25.0
+mass = 3.0
 
 [node name="Sketchfab_Scene" parent="." instance=ExtResource("4_yvxiu")]
 transform = Transform3D(17.6291, 0, 0, 0, 17.6291, 0, 0, 0, 18.4427, -0.0225526, 0, 130.634)
 
-[node name="OmniLight3D" type="OmniLight3D" parent="."]
-light_energy = 15.335
+[node name="OmniLight3D2" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 309.819, 162.175, 568.589)
+light_energy = 2500.0
+light_volumetric_fog_energy = 0.073
 shadow_enabled = true
-omni_range = 470.883
+omni_range = 7506.62
+
+[node name="OmniLight3D4" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -374.784, 118.264, 101.368)
+light_energy = 1171.88
+light_volumetric_fog_energy = 0.073
+shadow_enabled = true
+omni_range = 1501.32
 
 [node name="Salsa Dancing" parent="." instance=ExtResource("5_82jc5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.0307, -50.1163, 8.66386)
