@@ -13,7 +13,7 @@ func _init():
 var roof_uv_scale := 0.2/6  # Escala para el techo
 var wall_uv_scale := 0.25/6  # Escala para las paredes
 
-var eave_size = 0.8*0.25*6
+var eave_size = 0.8*0.25*15
 
 func config(base_quad: Array[Vector3], square_threshold := 0.15) -> Dictionary:
 	# Altura de un piso (entre 2.3 y 2.6)
@@ -23,7 +23,7 @@ func config(base_quad: Array[Vector3], square_threshold := 0.15) -> Dictionary:
 	var floor_height = rng.randf_range(3, 3.5)  # Altura por piso
 	var height = snapped(random_floors * floor_height * scale, 0.01)
 	# Altura del techo (60% - 85% de un piso)
-	var roof_percent = rng.randf_range(0.2, 0.3)
+	var roof_percent = rng.randf_range(0.2, 0.22)
 	var height_roof = snapped(height * roof_percent, 0.01)
 
 	# Tipo de techo (según cantidad de vértices)
@@ -38,7 +38,7 @@ func config(base_quad: Array[Vector3], square_threshold := 0.15) -> Dictionary:
 	var percentage := 1.0
 
 	if roof_type == 0:
-		num_dormers = rng.randi_range(1, 2)
+		num_dormers = [0,2,1,1,2,3][rng.randi_range(0, 5)]
 		percentage = rng.randf_range(0.8, 1.0)
 		
 

@@ -15,7 +15,7 @@ static func create_building(polygon: Array, world_position: Vector2, seed: int =
 	# Crear instancia del HouseBuilder
 	
 	# Configurar seed determinístico basado en posición
-	house_builder.rng.seed = generate_deterministic_seed(world_position, seed)
+	house_builder.rng.seed = RandomNumberGenerator.new().randi()
 	
 	# Generar la casa usando HouseBuilder
 	var mesh_instance = house_builder.build_house(base_poly_3d)

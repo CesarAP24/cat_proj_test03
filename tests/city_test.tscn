@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://c0kae6f0h1cyc" path="res://scripts/main.gd" id="1_lkicp"]
 [ext_resource type="Script" uid="uid://cwbd8nb65d51j" path="res://scripts/CityHandler/CityGeneratorV3.gd" id="2_n5rus"]
 [ext_resource type="Script" uid="uid://cyykjr8fvts8h" path="res://scripts/Camera.gd" id="3_n5rus"]
-[ext_resource type="PackedScene" uid="uid://c848apq8wl1vb" path="res://assets/cielo/Cycle.tscn" id="5_n5rus"]
+[ext_resource type="PackedScene" uid="uid://ctx7o0oui5win" path="res://assets/cielo/Day.tscn" id="6_1u6kc"]
 [ext_resource type="Material" uid="uid://d3qi7x4ykqhkw" path="res://materials/roof_material.tres" id="6_snnre"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_n5rus"]
@@ -17,15 +17,15 @@ camara_path = NodePath("Camera3D")
 script = ExtResource("2_n5rus")
 street_render_distance = 3
 mesh_generation_distance = 300.0
-block_padding = 30.0
+block_padding = 8.0
 lot_size = 50
 show_debug_overlay = false
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(0.999964, -0.00224809, 0.00812667, -0.00435428, 0.687668, 0.726012, -0.00722059, -0.726022, 0.687634, 0, 36.7529, -183.863)
 current = true
-fov = 82.6
 near = 0.1
+far = 4040.6
 script = ExtResource("3_n5rus")
 objetivo_path = NodePath("..")
 distancia = 30.0
@@ -43,13 +43,30 @@ spring_stiffness = 200.0
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.139104, 0.990278, 0, -0.990278, 0.139104, 6.9404, 0, 0)
-light_energy = 0.6
+light_energy = 0.8
+light_volumetric_fog_energy = 5.864
+light_specular = 0.616
 shadow_enabled = true
+shadow_bias = 0.0
+shadow_blur = 1.64
+directional_shadow_max_distance = 4007.0
+directional_shadow_pancake_size = 1.4
 
-[node name="Node3D" parent="." instance=ExtResource("5_n5rus")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 452.437, 642.334, -331.321)
+[node name="DirectionalLight3D2" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.139104, 0.990278, 0, -0.990278, 0.139104, 6.9404, 0, 0)
+light_energy = 1.272
+light_volumetric_fog_energy = 5.864
+light_specular = 0.616
+shadow_enabled = true
+shadow_bias = 0.0
+shadow_blur = 10.0
+directional_shadow_max_distance = 4007.0
+directional_shadow_pancake_size = 1.4
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1.03056, 0, 0, 0, 1.03056, 0, 0, 0, 1.03056, 0, 0, 0)
 material_override = ExtResource("6_snnre")
 mesh = SubResource("PlaneMesh_n5rus")
+
+[node name="Node3D" parent="." instance=ExtResource("6_1u6kc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.3754, 38.8633, 67.8822)
