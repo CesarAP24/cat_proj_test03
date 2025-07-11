@@ -1,101 +1,82 @@
 class_name StabilityChecker
 
-static var avenue_stability_cache: Dictionary = {}
-static var street_stability_cache: Dictionary = {}
-static var district_stability_cache: Dictionary = {}
-static var cache_expiry_time: int = 30000
+# Simple cache for stability checks
+static var stability_cache: Dictionary = {}
+static var cache_expiry_time: int = 30000  # 30 seconds
 
-static func is_avenue_point_stable(punto: Vector2, chunk_manager: SpatialChunkManager) -> bool:
-	var chunk_coord = chunk_manager.get_avenue_chunk_coord(punto.x, punto.y)
-	var cache_key = "ave_%d_%d" % [chunk_coord.x, chunk_coord.y]
-	
-	if _is_cache_valid(avenue_stability_cache, cache_key):
-		return avenue_stability_cache[cache_key]["result"]
-	
-	var is_stable = true
-	for dx in range(-1, 2):
-		for dy in range(-1, 2):
-			if dx == 0 and dy == 0:
-				continue
-			
-			var neighbor_coord = Vector2i(chunk_coord.x + dx, chunk_coord.y + dy)
-			
-			# VERIFICAR: ¿El chunk vecino existe en el área cargada?
-			var neighbor_key = "%d,%d" % [neighbor_coord.x, neighbor_coord.y]
-			if not chunk_manager.avenue_chunks.has(neighbor_key):
-				# Si el chunk no está cargado, no es estable
-				is_stable = false
-				break
-			
-			var neighbor_chunk = chunk_manager.avenue_chunks[neighbor_key]
-			
-			# VERIFICAR: ¿El chunk vecino tiene puntos?
-			if neighbor_chunk.avenue_points.size() == 0:
-				is_stable = false
-				break
-		
-		if not is_stable:
-			break
-	
-	_cache_result(avenue_stability_cache, cache_key, is_stable)
-	return is_stable
+# === MAIN STABILITY CHECKS ===
 
 static func is_street_point_stable(punto: Vector2, chunk_manager: SpatialChunkManager) -> bool:
 	var chunk_coord = chunk_manager.get_street_chunk_coord(punto.x, punto.y)
-	var cache_key = "str_%d_%d" % [chunk_coord.x, chunk_coord.y]
+	var cache_key = "street_%d_%d" % [chunk_coord.x, chunk_coord.y]
 	
-	return false
+	if is_cache_valid(cache_key):
+		return stability_cache[cache_key]["result"]
 	
-	if _is_cache_valid(street_stability_cache, cache_key):
-		return street_stability_cache[cache_key]["result"]
+	var is_stable = check_street_point_stability(punto, chunk_manager)
+	cache_stability_result(cache_key, is_stable)
 	
-	# Un punto de calle es estable SOLO SI está completamente rodeado por 8 chunks con puntos
-	# Y todos esos chunks están dentro del área de renderizado actual
-	var is_stable = true
+	return is_stable
+
+static func is_avenue_point_stable(punto: Vector2, chunk_manager: SpatialChunkManager) -> bool:
+	var chunk_coord = chunk_manager.get_avenue_chunk_coord(punto.x, punto.y)
+	var cache_key = "avenue_%d_%d" % [chunk_coord.x, chunk_coord.y]
 	
+	if is_cache_valid(cache_key):
+		return stability_cache[cache_key]["result"]
+	
+	var is_stable = check_avenue_point_stability(punto, chunk_manager)
+	cache_stability_result(cache_key, is_stable)
+	
+	return is_stable
+
+# === STABILITY LOGIC ===
+
+static func check_street_point_stability(punto: Vector2, chunk_manager: SpatialChunkManager) -> bool:
+	var chunk_coord = chunk_manager.get_street_chunk_coord(punto.x, punto.y)
+	
+	# A street point is stable if ALL 8 neighboring chunks are loaded and have points
+	return are_all_neighbors_loaded_and_populated(chunk_coord, chunk_manager, "street")
+
+static func check_avenue_point_stability(punto: Vector2, chunk_manager: SpatialChunkManager) -> bool:
+	var chunk_coord = chunk_manager.get_avenue_chunk_coord(punto.x, punto.y)
+	
+	# An avenue point is stable if ALL 8 neighboring chunks are loaded and have points
+	return are_all_neighbors_loaded_and_populated(chunk_coord, chunk_manager, "avenue")
+
+static func are_all_neighbors_loaded_and_populated(chunk_coord: Vector2i, chunk_manager: SpatialChunkManager, chunk_type: String) -> bool:
 	for dx in range(-1, 2):
 		for dy in range(-1, 2):
 			if dx == 0 and dy == 0:
-				continue
+				continue  # Skip center chunk
 			
 			var neighbor_coord = Vector2i(chunk_coord.x + dx, chunk_coord.y + dy)
 			
-			# VERIFICAR: ¿El chunk vecino existe en el área cargada?
-			var neighbor_key = "%d,%d" % [neighbor_coord.x, neighbor_coord.y]
-			if not chunk_manager.street_chunks.has(neighbor_key):
-				# Si el chunk no está cargado, no es estable
-				is_stable = false
-				break
-			
-			var neighbor_chunk = chunk_manager.street_chunks[neighbor_key]
-			
-			# VERIFICAR: ¿El chunk vecino tiene puntos?
-			if neighbor_chunk.street_points.size() == 0:
-				is_stable = false
-				break
+			if not is_neighbor_chunk_valid(neighbor_coord, chunk_manager, chunk_type):
+				return false
+	
+	return true
+
+static func is_neighbor_chunk_valid(chunk_coord: Vector2i, chunk_manager: SpatialChunkManager, chunk_type: String) -> bool:
+	var chunk_key = "%d,%d" % [chunk_coord.x, chunk_coord.y]
+	
+	match chunk_type:
+		"street":
+			if not chunk_manager.street_chunks.has(chunk_key):
+				return false
+			var chunk = chunk_manager.street_chunks[chunk_key]
+			return chunk.street_points.size() > 0
 		
-		if not is_stable:
-			break
-	
-	_cache_result(street_stability_cache, cache_key, is_stable)
-	return is_stable
+		"avenue":
+			if not chunk_manager.avenue_chunks.has(chunk_key):
+				return false
+			var chunk = chunk_manager.avenue_chunks[chunk_key]
+			return chunk.avenue_points.size() > 0
+		
+		_:
+			return false
 
-static func is_district_stable(distrito_hash: String, avenue_point: Vector2, chunk_manager: SpatialChunkManager) -> bool:
-	if _is_cache_valid(district_stability_cache, distrito_hash):
-		return district_stability_cache[distrito_hash]["result"]
-	
-	var is_stable = is_avenue_point_stable(avenue_point, chunk_manager)
-	_cache_result(district_stability_cache, distrito_hash, is_stable)
-	return is_stable
-
-static func get_stability_map_for_points(puntos: Array, chunk_manager: SpatialChunkManager) -> Dictionary:
-	var resultado = {}
-	
-	for punto in puntos:
-		var punto_hash = get_point_hash(punto)
-		resultado[punto_hash] = is_street_point_stable(punto, chunk_manager)
-	
-	return resultado
+# === UTILITY FUNCTIONS ===
 
 static func get_point_hash(point: Vector2) -> String:
 	var precision = 5.0
@@ -103,30 +84,60 @@ static func get_point_hash(point: Vector2) -> String:
 	var y_int = int(round(point.y / precision)) * precision
 	return "point_%d_%d" % [x_int, y_int]
 
-static func clear_stability_caches():
-	avenue_stability_cache.clear()
-	street_stability_cache.clear()
-	district_stability_cache.clear()
+static func get_district_hash(avenue_point: Vector2) -> String:
+	var precision = 10.0
+	var x_int = int(round(avenue_point.x / precision)) * precision
+	var y_int = int(round(avenue_point.y / precision)) * precision
+	return "district_%d_%d" % [x_int, y_int]
 
-static func _is_cache_valid(cache: Dictionary, cache_key: String) -> bool:
-	if not cache.has(cache_key):
+# === CACHE MANAGEMENT ===
+
+static func is_cache_valid(cache_key: String) -> bool:
+	if not stability_cache.has(cache_key):
 		return false
 	
-	var entry = cache[cache_key]
+	var entry = stability_cache[cache_key]
 	var current_time = Time.get_ticks_msec()
 	var age = current_time - entry.timestamp
 	
 	return age <= cache_expiry_time
 
-static func _cache_result(cache: Dictionary, cache_key: String, result: bool):
-	cache[cache_key] = {
+static func cache_stability_result(cache_key: String, result: bool):
+	stability_cache[cache_key] = {
 		"result": result,
 		"timestamp": Time.get_ticks_msec()
 	}
 
-# FUNCIONES DE DEBUG PARA VERIFICAR ESTABILIDAD
-static func debug_chunk_stability(punto: Vector2, chunk_manager: SpatialChunkManager) -> Dictionary:
-	var chunk_coord = chunk_manager.get_street_chunk_coord(punto.x, punto.y)
+static func clear_stability_cache():
+	stability_cache.clear()
+
+static func cleanup_expired_cache():
+	var current_time = Time.get_ticks_msec()
+	var expired_keys = []
+	
+	for cache_key in stability_cache:
+		var entry = stability_cache[cache_key]
+		var age = current_time - entry.timestamp
+		
+		if age > cache_expiry_time:
+			expired_keys.append(cache_key)
+	
+	for key in expired_keys:
+		stability_cache.erase(key)
+
+# === DEBUG FUNCTIONS ===
+
+static func debug_point_stability(punto: Vector2, chunk_manager: SpatialChunkManager, chunk_type: String = "street") -> Dictionary:
+	var chunk_coord: Vector2i
+	
+	match chunk_type:
+		"street":
+			chunk_coord = chunk_manager.get_street_chunk_coord(punto.x, punto.y)
+		"avenue":
+			chunk_coord = chunk_manager.get_avenue_chunk_coord(punto.x, punto.y)
+		_:
+			chunk_coord = chunk_manager.get_street_chunk_coord(punto.x, punto.y)
+	
 	var neighbors_info = []
 	var loaded_neighbors = 0
 	var neighbors_with_points = 0
@@ -136,36 +147,77 @@ static func debug_chunk_stability(punto: Vector2, chunk_manager: SpatialChunkMan
 			var neighbor_coord = Vector2i(chunk_coord.x + dx, chunk_coord.y + dy)
 			var is_center = (dx == 0 and dy == 0)
 			
-			var neighbor_key = "%d,%d" % [neighbor_coord.x, neighbor_coord.y]
-			var is_loaded = chunk_manager.street_chunks.has(neighbor_key)
-			var has_points = false
-			var point_count = 0
+			var neighbor_info = get_neighbor_debug_info(neighbor_coord, chunk_manager, chunk_type)
+			neighbors_info.append(neighbor_info)
 			
-			if is_loaded:
-				var neighbor_chunk = chunk_manager.street_chunks[neighbor_key]
-				has_points = neighbor_chunk.street_points.size() > 0
-				point_count = neighbor_chunk.street_points.size()
-				
-				if not is_center:
+			if not is_center:
+				if neighbor_info.is_loaded:
 					loaded_neighbors += 1
-					if has_points:
-						neighbors_with_points += 1
-			
-			neighbors_info.append({
-				"coord": neighbor_coord,
-				"is_center": is_center,
-				"is_loaded": is_loaded,
-				"has_points": has_points,
-				"point_count": point_count
-			})
+				if neighbor_info.has_points:
+					neighbors_with_points += 1
 	
 	var is_stable = loaded_neighbors == 8 and neighbors_with_points == 8
 	
 	return {
 		"center_chunk": chunk_coord,
+		"chunk_type": chunk_type,
 		"is_stable": is_stable,
 		"loaded_neighbors": loaded_neighbors,
 		"neighbors_with_points": neighbors_with_points,
 		"neighbors_info": neighbors_info,
-		"stability_requirements": "Necesita 8 vecinos cargados con puntos"
+		"stability_requirements": "Needs 8 loaded neighbors with points"
+	}
+
+static func get_neighbor_debug_info(chunk_coord: Vector2i, chunk_manager: SpatialChunkManager, chunk_type: String) -> Dictionary:
+	var chunk_key = "%d,%d" % [chunk_coord.x, chunk_coord.y]
+	var is_loaded = false
+	var has_points = false
+	var point_count = 0
+	
+	match chunk_type:
+		"street":
+			is_loaded = chunk_manager.street_chunks.has(chunk_key)
+			if is_loaded:
+				var chunk = chunk_manager.street_chunks[chunk_key]
+				point_count = chunk.street_points.size()
+				has_points = point_count > 0
+		
+		"avenue":
+			is_loaded = chunk_manager.avenue_chunks.has(chunk_key)
+			if is_loaded:
+				var chunk = chunk_manager.avenue_chunks[chunk_key]
+				point_count = chunk.avenue_points.size()
+				has_points = point_count > 0
+	
+	return {
+		"coord": chunk_coord,
+		"is_loaded": is_loaded,
+		"has_points": has_points,
+		"point_count": point_count
+	}
+
+# === TESTING FUNCTIONS ===
+
+static func force_point_stable_for_testing(punto: Vector2) -> bool:
+	# Temporary function for testing - always returns true
+	# Remove this in production
+	return true
+
+static func get_cache_stats() -> Dictionary:
+	var current_time = Time.get_ticks_msec()
+	var valid_entries = 0
+	var expired_entries = 0
+	
+	for entry in stability_cache.values():
+		var age = current_time - entry.timestamp
+		if age <= cache_expiry_time:
+			valid_entries += 1
+		else:
+			expired_entries += 1
+	
+	return {
+		"total_cached": stability_cache.size(),
+		"valid_entries": valid_entries,
+		"expired_entries": expired_entries,
+		"cache_hit_potential": float(valid_entries) / max(1, stability_cache.size())
 	}

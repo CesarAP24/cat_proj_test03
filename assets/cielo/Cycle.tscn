@@ -1,6 +1,6 @@
 [gd_scene load_steps=17 format=3 uid="uid://c848apq8wl1vb"]
 
-[ext_resource type="Shader" path="res://assets/cielo/stylized-sky.gdshader" id="1_ejpck"]
+[ext_resource type="Shader" uid="uid://chmjr7xvcgtg3" path="res://assets/cielo/stylized-sky.gdshader" id="1_ejpck"]
 [ext_resource type="PackedScene" uid="uid://mj4h6f7bo7yw" path="res://assets/cielo/DayNightCycle.tscn" id="2_3phje"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_3phje"]
@@ -21,6 +21,8 @@ fractal_lacunarity = 5.0
 fractal_gain = 1.0
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_qatya"]
+width = 1024
+height = 1024
 seamless = true
 noise = SubResource("FastNoiseLite_kd065")
 
@@ -29,8 +31,7 @@ offsets = PackedFloat32Array(0, 0.815739)
 colors = PackedColorArray(0, 0, 0, 1, 1, 1, 1, 0.266667)
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_6erky"]
-noise_type = 0
-frequency = 0.0025
+frequency = 0.0049
 fractal_octaves = 4
 fractal_lacunarity = 6.0
 fractal_gain = -0.4
@@ -39,7 +40,6 @@ fractal_gain = -0.4
 width = 2000
 height = 2000
 invert = true
-in_3d_space = true
 seamless = true
 color_ramp = SubResource("Gradient_ejpck")
 noise = SubResource("FastNoiseLite_6erky")
@@ -62,7 +62,7 @@ shader_parameter/cloud_noise_sampler = SubResource("NoiseTexture2D_qatya")
 shader_parameter/cloud_curves = SubResource("CurveTexture_ts46d")
 shader_parameter/clouds_samples = 32
 shader_parameter/shadow_sample = 4
-shader_parameter/clouds_density = 0.4
+shader_parameter/clouds_density = 0.2
 shader_parameter/clouds_scale = 0.5
 shader_parameter/clouds_smoothness = 0.05
 shader_parameter/clouds_light_color = Color(0.227451, 0.447059, 1, 1)
@@ -89,8 +89,12 @@ background_mode = 2
 sky = SubResource("Sky_s7pey")
 ambient_light_color = Color(1, 1, 1, 1)
 glow_enabled = true
+fog_enabled = true
+fog_density = 0.0006
+fog_aerial_perspective = 1.0
 volumetric_fog_enabled = true
-volumetric_fog_density = 0.005
+volumetric_fog_density = 0.0268
+volumetric_fog_length = 10.0
 adjustment_enabled = true
 
 [node name="Node3D" type="Node3D"]
