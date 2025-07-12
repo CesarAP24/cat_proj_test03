@@ -11,13 +11,15 @@ config_version=5
 [application]
 
 config/name="tes03_godot_cat"
-run/main_scene="uid://4j4maeatft45"
+run/main_scene="uid://dgs1yfy30gatj"
 config/features=PackedStringArray("4.4")
 config/icon="res://icon.png"
 
 [display]
 
 window/size/viewport_width=1020
+window/stretch/mode="canvas_items"
+window/stretch/aspect="ignore"
 
 [editor_plugins]
 
