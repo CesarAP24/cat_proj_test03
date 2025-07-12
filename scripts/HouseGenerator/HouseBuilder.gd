@@ -52,6 +52,9 @@ func config(base_quad: Array[Vector3], square_threshold := 0.15) -> Dictionary:
 
 
 func get_new_eave(prota: Vector3, ridge: Vector3, contrario: Vector3, dormer: bool) -> Vector3:
+	if ridge == Vector3.ZERO or contrario == Vector3.ZERO:
+		return prota  # Fallback seguro
+		
 	var v = (ridge - prota).normalized()
 	var u = (contrario - prota).normalized()
 	var scale = 1
@@ -492,11 +495,8 @@ func build_house(base_poly: Array[Vector3], door_index: int = 4) -> MeshInstance
 		return MeshInstance3D.new()
 
 	# DESFASE HACIA ABAJO - Agregar offset negativo en Y
-	var y_offset = generate_y_offset_from_noise(base_poly) - 50
+	var y_offset = generate_y_offset_from_noise(base_poly)
 	
-	# Aplicar desfase a base_poly
-	for i in range(base_poly.size()):
-		base_poly[i].y += y_offset
 
 	# Reordenar base_poly solo si el techo será one slope
 	if roof_type == 2:
@@ -506,6 +506,11 @@ func build_house(base_poly: Array[Vector3], door_index: int = 4) -> MeshInstance
 			for i in range(n):
 				rotated.append(base_poly[(first + i) % n])
 			base_poly = rotated
+			
+			
+	# Aplicar desfase a base_poly
+	for i in range(base_poly.size()):
+		base_poly[i].y 	= y_offset
 
 	# Crear top_polygon elevando en Y (ya con el offset aplicado)
 	var top_poly: Array[Vector3] = []
@@ -554,10 +559,23 @@ func generate_y_offset_from_noise(base_poly: Array[Vector3]) -> float:
 		center += point
 	center /= base_poly.size()
 	
-	# Obtener valor noise (-1 a 1)
-	var noise_value = terrain_noise.get_noise_2d(center.x, center.z)
+	# Evaluar noise en centro y todas las esquinas
+	var noise_values = []
 	
-	# Mapear a rango de offset (-30 a -10 metros por ejemplo)
-	var min_offset = 100.0
-	var max_offset = -100.0
-	return min_offset + (noise_value + 1.0) * 0.5 * (max_offset - min_offset)
+	# Agregar noise del centro
+	noise_values.append(terrain_noise.get_noise_2d(center.x, center.z))
+	
+	# Agregar noise de todas las esquinas
+	for point in base_poly:
+		noise_values.append(terrain_noise.get_noise_2d(point.x, point.z))
+	
+	# Obtener el valor MÍNIMO de todos los puntos evaluados
+	var min_noise_value = noise_values[0]
+	for noise_val in noise_values:
+		if noise_val < min_noise_value:
+			min_noise_value = noise_val
+	
+	# Mapear a rango de offset usando el valor mínimo
+	var min_offset = -10.0
+	var max_offset = 0.0
+	return min_offset + (min_noise_value + 1.0) * 0.5 * (max_offset - min_offset) - 50

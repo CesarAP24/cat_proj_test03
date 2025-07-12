@@ -24,9 +24,9 @@ const RADIO = 1
 @export var camara_path: NodePath
 var camara: Camera3D
 
-@export var VELOCIDAD_PREPARACION_SALTO = 1.8
+@export var VELOCIDAD_PREPARACION_SALTO = 0.5
 @export var VELOCIDAD_EJECUCION_SALTO = 0.8
-@export var VELOCIDAD_ATERRIZAJE = 1.1
+@export var VELOCIDAD_ATERRIZAJE = 0.8
 
 @export var RADIO_BUSQUEDA_PATA = 200 * ESCALA
 @export var UMBRAL_ALTURA_CRITICA = 80 * ESCALA
@@ -866,7 +866,7 @@ func mover_patas(delta):
 				Estado.SALTO_PREP: velocidad_actual = VELOCIDAD_PREPARACION_SALTO * VELOCIDAD_BASE
 				Estado.SALTO: velocidad_actual = VELOCIDAD_EJECUCION_SALTO * VELOCIDAD_BASE
 				Estado.ATERRIZAJE: velocidad_actual = VELOCIDAD_ATERRIZAJE * VELOCIDAD_BASE
-				Estado.CORRER_PREP: velocidad_actual = VELOCIDAD_PREPARACION_SALTO * VELOCIDAD_BASE * VELOCIDAD_CORRER
+				Estado.CORRER_PREP: velocidad_actual = VELOCIDAD_PREPARACION_SALTO * VELOCIDAD_BASE * VELOCIDAD_CORRER * 3
 				Estado.CORRER_SALTO: velocidad_actual = VELOCIDAD_EJECUCION_SALTO * VELOCIDAD_BASE * VELOCIDAD_CORRER
 				Estado.CORRER_ATERRIZAJE: velocidad_actual = VELOCIDAD_ATERRIZAJE * VELOCIDAD_BASE * VELOCIDAD_CORRER
 			
@@ -879,7 +879,7 @@ func mover_patas(delta):
 			elif estado_actual == Estado.ATERRIZAJE and (nombre == "backL" or nombre == "backR"):
 				factor_altura = 0.5 if salto_es_bajada else 1.2
 			elif estado_actual == Estado.CORRER_SALTO and (nombre == "frontL" or nombre == "frontR"):
-				factor_altura = 3.0 if salto_es_alto else 1.0
+				factor_altura = 1.0
 			elif estado_actual == Estado.CORRER_ATERRIZAJE and (nombre == "backL" or nombre == "backR"):
 				factor_altura = 0.8
 			

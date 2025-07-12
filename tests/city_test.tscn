@@ -1,13 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://4j4maeatft45"]
+[gd_scene load_steps=7 format=3 uid="uid://4j4maeatft45"]
 
 [ext_resource type="PackedScene" uid="uid://cppicxpa1x7l5" path="res://assets/black_model.tscn" id="1_iet0h"]
 [ext_resource type="Script" uid="uid://c0kae6f0h1cyc" path="res://scripts/main.gd" id="1_lkicp"]
 [ext_resource type="Script" uid="uid://cwbd8nb65d51j" path="res://scripts/CityHandler/CityGeneratorV3.gd" id="2_n5rus"]
 [ext_resource type="Script" uid="uid://cyykjr8fvts8h" path="res://scripts/Camera.gd" id="3_n5rus"]
-[ext_resource type="PackedScene" uid="uid://ctx7o0oui5win" path="res://assets/cielo/Day.tscn" id="6_1u6kc"]
-[ext_resource type="Material" uid="uid://d3qi7x4ykqhkw" path="res://materials/roof_material.tres" id="6_snnre"]
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_n5rus"]
+[ext_resource type="Material" uid="uid://das1tcskvyg3y" path="res://materials/wall_material.tres" id="3_snnre"]
+[ext_resource type="PackedScene" uid="uid://4wn102ke0huh" path="res://assets/cielo/Night.tscn" id="5_n5rus"]
 
 [node name="CityTest" type="Node3D"]
 script = ExtResource("1_lkicp")
@@ -15,10 +13,15 @@ camara_path = NodePath("Camera3D")
 
 [node name="CityGenerator" type="Node3D" parent="."]
 script = ExtResource("2_n5rus")
-street_render_distance = 3
-mesh_generation_distance = 300.0
-block_padding = 8.0
+avenue_chunk_size = 1400
+street_chunk_size = 700
+avenue_render_distance = 2
+street_render_distance = 2
+mesh_generation_distance = 400.0
+block_padding = 0.0
 lot_size = 50
+terrain_resolution = 64
+terrain_material = ExtResource("3_snnre")
 show_debug_overlay = false
 
 [node name="Camera3D" type="Camera3D" parent="."]
@@ -39,34 +42,22 @@ velocidad_suavizado = 7.0
 [node name="black_model" parent="." instance=ExtResource("1_iet0h")]
 objetivo_path = NodePath("..")
 offset_y = 7.0
-spring_stiffness = 200.0
+spring_stiffness = 400.0
+spring_damping = 30.0
+mass = 1.3
+DISTANCIA_MINIMA_COLA = 0.01
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.139104, 0.990278, 0, -0.990278, 0.139104, 6.9404, 0, 0)
-light_energy = 0.8
-light_volumetric_fog_energy = 5.864
+transform = Transform3D(0.575619, -0.538386, -0.61547, 0.81646, 0.420132, 0.396083, 0.0453328, -0.7305, 0.681407, 6.9404, 0, 0)
+light_energy = 0.5
+light_indirect_energy = 10.547
+light_volumetric_fog_energy = 8.848
 light_specular = 0.616
 shadow_enabled = true
 shadow_bias = 0.0
-shadow_blur = 1.64
+shadow_blur = 3.959
 directional_shadow_max_distance = 4007.0
-directional_shadow_pancake_size = 1.4
+directional_shadow_pancake_size = 0.1
 
-[node name="DirectionalLight3D2" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.139104, 0.990278, 0, -0.990278, 0.139104, 6.9404, 0, 0)
-light_energy = 1.272
-light_volumetric_fog_energy = 5.864
-light_specular = 0.616
-shadow_enabled = true
-shadow_bias = 0.0
-shadow_blur = 10.0
-directional_shadow_max_distance = 4007.0
-directional_shadow_pancake_size = 1.4
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1.03056, 0, 0, 0, 1.03056, 0, 0, 0, 1.03056, 0, 0, 0)
-material_override = ExtResource("6_snnre")
-mesh = SubResource("PlaneMesh_n5rus")
-
-[node name="Node3D" parent="." instance=ExtResource("6_1u6kc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.3754, 38.8633, 67.8822)
+[node name="Node3D" parent="." instance=ExtResource("5_n5rus")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -258.353, 295.14, 14.6633)

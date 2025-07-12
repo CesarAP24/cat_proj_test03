@@ -1,6 +1,6 @@
 [gd_scene load_steps=15 format=3 uid="uid://4wn102ke0huh"]
 
-[ext_resource type="Shader" path="res://assets/cielo/stylized-sky.gdshader" id="1_kucjc"]
+[ext_resource type="Shader" uid="uid://chmjr7xvcgtg3" path="res://assets/cielo/stylized-sky.gdshader" id="1_kucjc"]
 [ext_resource type="Texture2D" uid="uid://bdpisnkys1ias" path="res://assets/cielo/moon.png" id="2_cxmo2"]
 [ext_resource type="Texture2D" uid="uid://uejbn5cp54p2" path="res://assets/cielo/shooting_star_sampler.png" id="3_qb0qd"]
 
@@ -45,16 +45,16 @@ shader_parameter/cloud_noise_sampler = SubResource("NoiseTexture2D_cxmo2")
 shader_parameter/cloud_curves = SubResource("CurveTexture_kucjc")
 shader_parameter/clouds_samples = 32
 shader_parameter/shadow_sample = 4
-shader_parameter/clouds_density = 0.4
-shader_parameter/clouds_scale = 1.0
+shader_parameter/clouds_density = 0.0
+shader_parameter/clouds_scale = 0.5
 shader_parameter/clouds_smoothness = 0.05
 shader_parameter/clouds_light_color = Color(0.227451, 0.447059, 1, 1)
 shader_parameter/clouds_shadow_intensity = 8.0
 shader_parameter/high_clouds_sampler = SubResource("NoiseTexture2D_1iaux")
-shader_parameter/high_clouds_density = 0.2
-shader_parameter/top_color = Color(0.027451, 0.101961, 0.25098, 1)
-shader_parameter/bottom_color = Color(0.027451, 0.101961, 0.25098, 1)
-shader_parameter/sun_scatter = Color(0.12549, 0.0862745, 0.372549, 1)
+shader_parameter/high_clouds_density = 0.05
+shader_parameter/top_color = Color(0.017604, 0.049925, 0.117822, 1)
+shader_parameter/bottom_color = Color(0.034188, 0.11355, 0.244021, 1)
+shader_parameter/sun_scatter = Color(0.0202345, 0.094446, 0.218973, 1)
 shader_parameter/astro_tint = Color(1, 1, 1, 1)
 shader_parameter/astro_sampler = ExtResource("2_cxmo2")
 shader_parameter/astro_scale = 6.0
@@ -70,8 +70,20 @@ sky_material = SubResource("ShaderMaterial_3o5rm")
 [sub_resource type="Environment" id="Environment_fgyk3"]
 background_mode = 2
 sky = SubResource("Sky_qlr4p")
+ambient_light_color = Color(0.992962, 0.887893, 0.732573, 1)
+ambient_light_sky_contribution = 0.07
+ambient_light_energy = 0.13
 tonemap_mode = 2
 glow_enabled = true
+fog_enabled = true
+fog_light_color = Color(0.493, 0.52635, 0.58, 1)
+fog_light_energy = 0.23
+fog_density = 0.0158
+fog_sky_affect = 0.88
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.0024
+volumetric_fog_albedo = Color(0.099986, 0.099986, 0.099986, 1)
+volumetric_fog_length = 208.63
 adjustment_enabled = true
 adjustment_contrast = 1.5
 adjustment_saturation = 1.2
@@ -80,7 +92,3 @@ adjustment_saturation = 1.2
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_fgyk3")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
-shadow_enabled = true

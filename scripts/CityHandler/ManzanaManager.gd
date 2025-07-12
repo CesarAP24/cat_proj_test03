@@ -48,7 +48,6 @@ func is_point_stable(punto: Vector2) -> bool:
 
 func create_and_register_manzana(punto: Vector2, punto_hash: String, manzana_polygon: Array) -> bool:
 	var mesh_instances = create_manzana_mesh(punto, manzana_polygon)
-	print("try")
 	if mesh_instances.is_empty():
 		return false
 	
@@ -77,7 +76,116 @@ func create_padded_polygon(manzana_polygon: Array) -> Array:
 	return GeometryUtils.create_padded_polygon(manzana_polygon, block_padding)
 
 func subdivide_polygon_into_lots(polygon: Array) -> Array:
-	return PolygonSubdivider.subdivide_polygon(polygon, lot_size)
+	# Primero simplificar el polígono antes de subdividir
+	var simplified_polygon = simplify_polygon(polygon)
+	return PolygonSubdivider.subdivide_polygon(simplified_polygon, lot_size)
+
+func simplify_polygon(polygon: Array) -> Array:
+	if polygon.size() < 3:
+		return polygon
+	
+	var current_polygon = polygon.duplicate()
+	var max_iterations = 10  # Prevenir loops infinitos
+	var iteration = 0
+	
+	while iteration < max_iterations:
+		var simplified = simplify_polygon_iteration(current_polygon)
+		
+		# Si no cambió nada, converged
+		if simplified.size() == current_polygon.size():
+			break
+		
+		current_polygon = simplified
+		iteration += 1
+		
+		# Asegurar que siempre tengamos al menos un triángulo
+		if current_polygon.size() < 3:
+			break
+	
+	return current_polygon
+
+func simplify_polygon_iteration(polygon: Array) -> Array:
+	if polygon.size() < 4:  # Un triángulo ya es lo más simple posible
+		return polygon
+	
+	# Calcular promedio de longitudes de aristas
+	var average_edge_length = calculate_average_edge_length(polygon)
+	var merge_threshold = average_edge_length / 3.0
+	
+	# Encontrar pares de vértices que están muy cerca
+	var vertices_to_merge = find_close_vertex_pairs(polygon, merge_threshold)
+	
+	if vertices_to_merge.is_empty():
+		return polygon  # No hay nada que simplificar
+	
+	# Fusionar vértices y reconstruir polígono
+	return merge_vertices_and_reconstruct(polygon, vertices_to_merge)
+
+func calculate_average_edge_length(polygon: Array) -> float:
+	if polygon.size() < 2:
+		return 0.0
+	
+	var total_length = 0.0
+	var edge_count = polygon.size()
+	
+	for i in range(polygon.size()):
+		var current_vertex = polygon[i] as Vector2
+		var next_vertex = polygon[(i + 1) % polygon.size()] as Vector2
+		total_length += current_vertex.distance_to(next_vertex)
+	
+	return total_length / edge_count
+
+func find_close_vertex_pairs(polygon: Array, threshold: float) -> Array:
+	var close_pairs = []
+	
+	for i in range(polygon.size()):
+		var current_vertex = polygon[i] as Vector2
+		var next_index = (i + 1) % polygon.size()
+		var next_vertex = polygon[next_index] as Vector2
+		
+		var distance = current_vertex.distance_to(next_vertex)
+		
+		if distance < threshold:
+			close_pairs.append({
+				"index1": i,
+				"index2": next_index,
+				"distance": distance
+			})
+	
+	# Ordenar por distancia (más cerca primero) para fusionar los más obvios primero
+	close_pairs.sort_custom(func(a, b): return a.distance < b.distance)
+	
+	return close_pairs
+
+func merge_vertices_and_reconstruct(polygon: Array, vertices_to_merge: Array) -> Array:
+	if vertices_to_merge.is_empty():
+		return polygon
+	
+	# Procesar solo el primer par para evitar conflictos
+	var pair = vertices_to_merge[0]
+	var index1 = pair.index1
+	var index2 = pair.index2
+	
+	var vertex1 = polygon[index1] as Vector2
+	var vertex2 = polygon[index2] as Vector2
+	
+	# Calcular punto promedio
+	var merged_vertex = (vertex1 + vertex2) / 2.0
+	
+	# Crear nuevo polígono sin uno de los vértices
+	var new_polygon = []
+	
+	for i in range(polygon.size()):
+		if i == index1:
+			# Reemplazar vertex1 con el punto fusionado
+			new_polygon.append(merged_vertex)
+		elif i == index2:
+			# Saltar vertex2 (ya fusionado)
+			continue
+		else:
+			new_polygon.append(polygon[i])
+	
+	return new_polygon
 
 func create_buildings_from_lots(lots: Array, punto: Vector2) -> Array:
 	if lots.is_empty():

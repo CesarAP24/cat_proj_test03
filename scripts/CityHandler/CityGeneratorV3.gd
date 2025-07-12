@@ -13,6 +13,10 @@ var current_street_chunk: Vector2i
 var last_avenue_chunk: Vector2i
 var last_street_chunk: Vector2i
 
+var terrain_chunks_generated: Dictionary = {}  # Para trackear chunks ya generados
+var terrain_container: Node3D
+
+
 # Configuration
 @export_group("Chunk Configuration")
 @export var avenue_chunk_size: int = 1300
@@ -28,6 +32,11 @@ var last_street_chunk: Vector2i
 @export var mesh_generation_distance: float = 200.0
 @export var block_padding: float = 10.0
 @export var lot_size: int = 100
+
+@export_group("Terrain Configuration")
+@export var terrain_resolution: int = 128
+@export var terrain_material: Material
+@export var generate_terrain: bool = true
 
 @export_group("Debug")
 @export var show_debug_overlay: bool = true
@@ -70,11 +79,14 @@ func create_manzana_manager():
 	manzana_manager.initialize(chunk_manager, containers, mesh_generation_distance, block_padding, lot_size)
 
 func create_mesh_containers():
-	for container_name in ["Districts", "Blocks", "Buildings"]:
+	for container_name in ["Districts", "Blocks", "Buildings", "Terrain"]:  # Agregar "Terrain"
 		var container = Node3D.new()
 		container.name = container_name
 		add_child(container)
 		containers[container_name.to_lower()] = container
+	
+	# Guardar referencia al contenedor de terreno
+	terrain_container = containers.terrain
 
 func setup_debug_overlay():
 	debug_canvas = CanvasLayer.new()
@@ -147,6 +159,9 @@ func regenerate_city():
 	
 	if has_avenue_chunk_changed():
 		regenerate_districts()
+		# NUEVO: Generar terreno cuando cambia el chunk de avenida
+		if generate_terrain:
+			generate_terrain_chunks_around_player()
 	else:
 		generate_nearby_manzanas()
 	
@@ -460,3 +475,116 @@ class DebugOverlay extends Control:
 		for i in range(info.size()):
 			draw_string(ThemeDB.fallback_font, Vector2(10, 30 + i * 20), info[i], 
 					   HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.WHITE)
+
+func generate_terrain_chunks_around_player():
+	var center_chunk = Vector2i(
+		int(floor(player_position.x / avenue_chunk_size)),
+		int(floor(player_position.y / avenue_chunk_size))
+	)
+	
+	# Generar 9 chunks alrededor del jugador (3x3)
+	for dx in range(-1, 2):
+		for dy in range(-1, 2):
+			var chunk_coord = Vector2i(center_chunk.x + dx, center_chunk.y + dy)
+			generate_terrain_chunk_if_needed(chunk_coord)
+
+func generate_terrain_chunk_if_needed(chunk_coord: Vector2i):
+	var chunk_key = "%d_%d" % [chunk_coord.x, chunk_coord.y]
+	
+	# Si ya fue generado, no hacer nada
+	if terrain_chunks_generated.has(chunk_key):
+		return
+	
+	# Marcar como generado para evitar regenerar
+	terrain_chunks_generated[chunk_key] = true
+	
+	# Crear la malla del terreno
+	var mesh_instance = create_terrain_chunk_mesh(chunk_coord)
+	if mesh_instance and terrain_container:
+		terrain_container.add_child(mesh_instance)
+		print("🌍 Generated terrain chunk: (%d, %d)" % [chunk_coord.x, chunk_coord.y])
+
+func create_terrain_chunk_mesh(chunk_coord: Vector2i) -> MeshInstance3D:
+	var mesh_instance = MeshInstance3D.new()
+	mesh_instance.name = "TerrainChunk_%d_%d" % [chunk_coord.x, chunk_coord.y]
+	
+	# Calcular límites del chunk en el mundo
+	var chunk_world_x = chunk_coord.x * avenue_chunk_size
+	var chunk_world_z = chunk_coord.y * avenue_chunk_size
+	
+	# Crear malla usando el generador
+	var mesh = create_terrain_mesh_for_chunk(chunk_world_x, chunk_world_z, avenue_chunk_size)
+	mesh_instance.mesh = mesh
+	
+	if terrain_material:
+		mesh_instance.material_override = terrain_material
+	
+	return mesh_instance
+
+# Inicializar noise igual que HouseBuilder
+static var terrain_noise: FastNoiseLite
+
+func create_terrain_mesh_for_chunk(start_x: float, start_z: float, chunk_size: int) -> ArrayMesh:
+	# Inicializar ruido igual que en HouseBuilder
+	if not terrain_noise:
+		terrain_noise = FastNoiseLite.new()
+		terrain_noise.noise_type = FastNoiseLite.TYPE_PERLIN
+		terrain_noise.seed = 54321
+		terrain_noise.frequency = 0.005
+	
+	var array_mesh = ArrayMesh.new()
+	var vertices = PackedVector3Array()
+	var normals = PackedVector3Array()
+	var uvs = PackedVector2Array()
+	var indices = PackedInt32Array()
+	
+	var step = float(chunk_size) / float(terrain_resolution - 1)
+	
+	# Generar vértices
+	for z in range(terrain_resolution):
+		for x in range(terrain_resolution):
+			var world_x = start_x + x * step
+			var world_z = start_z + z * step
+			
+			# MISMA lógica que HouseBuilder
+			var noise_value = terrain_noise.get_noise_2d(world_x, world_z)
+			var min_offset = -10.0
+			var max_offset = 0.0
+			var height = min_offset + (noise_value + 1.0) * 0.5 * (max_offset - min_offset) - 50
+			
+			vertices.append(Vector3(world_x, height, world_z))
+			var uv_scale = 100  # Ajusta este valor
+			uvs.append(Vector2(float(x) / float(terrain_resolution - 1) * uv_scale, 
+							  float(z) / float(terrain_resolution - 1) * uv_scale))
+	
+	# Generar índices
+	for z in range(terrain_resolution - 1):
+		for x in range(terrain_resolution - 1):
+			var top_left = z * terrain_resolution + x
+			var top_right = top_left + 1
+			var bottom_left = (z + 1) * terrain_resolution + x
+			var bottom_right = bottom_left + 1
+			
+			indices.append(top_left)
+			indices.append(top_right)
+			indices.append(bottom_left)
+
+			indices.append(top_right)
+			indices.append(bottom_right)
+			indices.append(bottom_left)
+	
+	# Calcular normales básicas
+	normals.resize(vertices.size())
+	for i in range(vertices.size()):
+		normals[i] = Vector3.UP  # Normales simples hacia arriba
+	
+	# Crear malla
+	var arrays = []
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX] = vertices
+	arrays[Mesh.ARRAY_NORMAL] = normals
+	arrays[Mesh.ARRAY_TEX_UV] = uvs
+	arrays[Mesh.ARRAY_INDEX] = indices
+	
+	array_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	return array_mesh
