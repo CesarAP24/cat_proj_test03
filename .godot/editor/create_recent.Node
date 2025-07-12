@@ -1,6 +1,6 @@
+CSGSphere3D
 MeshInstance3D
 DirectionalLight3D
-CSGSphere3D
 SpotLight3D
 AspectRatioContainer
 OmniLight3D

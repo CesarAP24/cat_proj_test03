@@ -1,11 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://dkpedmbd384id"]
+[gd_scene load_steps=8 format=3 uid="uid://dkpedmbd384id"]
 
 [ext_resource type="Script" uid="uid://c0kae6f0h1cyc" path="res://scripts/main.gd" id="1_mrabx"]
 [ext_resource type="Script" uid="uid://di8sk7kmiq0wr" path="res://scripts/audio_listener_3d.gd" id="2_4rhi5"]
 [ext_resource type="Script" uid="uid://cyykjr8fvts8h" path="res://scripts/Camera.gd" id="2_v4jus"]
 [ext_resource type="PackedScene" uid="uid://cppicxpa1x7l5" path="res://assets/black_model.tscn" id="4_4rhi5"]
 [ext_resource type="PackedScene" uid="uid://cw6xnniivw4rx" path="res://assets/salsa_dancing.tscn" id="4_osey5"]
-[ext_resource type="PackedScene" uid="uid://c848apq8wl1vb" path="res://assets/cielo/Cycle.tscn" id="6_kva37"]
 
 [sub_resource type="BoxShape3D" id="2"]
 
@@ -261,5 +260,3 @@ light_energy = 16.0
 light_volumetric_fog_energy = 4.717
 spot_range = 74.7805
 spot_angle = 29.4748
-
-[node name="Node3D2" parent="." instance=ExtResource("6_kva37")]
