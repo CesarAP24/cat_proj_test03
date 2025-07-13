@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MISI - Documentación</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0f1a 0%, #1a2332 50%, #0f1419 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background Grid Effect */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: rgba(0, 20, 30, 0.8);
+            border-right: 1px solid rgba(0, 255, 255, 0.2);
+            padding: 2rem 0;
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+        }
+
+        .logo {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .logo p {
+            color: #888;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .search-box {
+            padding: 0 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(0, 40, 60, 0.3);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 6px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .search-box input::placeholder {
+            color: #666;
+        }
+
+        /* Navigation */
+        .nav-section {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-header {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-header:hover {
+            background: rgba(0, 40, 60, 0.3);
+            border-left-color: #00ffff;
+        }
+
+        .nav-header.active {
+            background: rgba(0, 60, 90, 0.5);
+            border-left-color: #ff4757;
+        }
+
+        .nav-arrow {
+            margin-right: 0.5rem;
+            font-size: 0.8rem;
+            color: #ff4757;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-arrow.expanded {
+            transform: rotate(90deg);
+        }
+
+        .nav-title {
+            font-family: 'Orbitron', monospace;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #ff4757;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-items {
+            display: none;
+            padding-left: 1rem;
+            border-left: 1px solid rgba(0, 255, 255, 0.1);
+            margin-left: 2rem;
+        }
+
+        .nav-items.expanded {
+            display: block;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            margin: 0.25rem 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 60, 90, 0.3);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(0, 255, 255, 0.1);
+            border-left: 2px solid #00ffff;
+        }
+
+        .nav-item-content {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .nav-item-icon {
+            margin-right: 0.5rem;
+            color: #00ffff;
+            font-size: 0.8rem;
+        }
+
+        .nav-item-text {
+            color: #ccc;
+            font-size: 0.85rem;
+        }
+
+        .nav-item-toggle {
+            color: #888;
+            font-size: 0.7rem;
+            margin-left: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item-toggle.expanded {
+            transform: rotate(90deg);
+        }
+
+        /* Subsubsections */
+        .nav-subitems {
+            width: 100%;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding-left: 2rem;
+            border-left: 2px solid rgba(0, 255, 255, 0.2);
+            display: none;
+        }
+
+        .nav-subitems.expanded {
+            display: block;
+        }
+
+        .nav-subitem {
+            display: flex;
+            align-items: center;
+            padding: 0.3rem 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 3px;
+            margin: 0.1rem 0;
+        }
+
+        .nav-subitem:hover {
+            background: rgba(0, 60, 90, 0.3);
+            transform: translateX(3px);
+        }
+
+        .nav-subitem-icon {
+            margin-right: 0.5rem;
+            color: #00ffff;
+            font-size: 0.7rem;
+        }
+
+        .nav-subitem-text {
+            color: #aaa;
+            font-size: 0.8rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .breadcrumb {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: #00ffff;
+            text-decoration: none;
+        }
+
+        .github-link {
+            color: #00ffff;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .content-area {
+            max-width: 1000px;
+            line-height: 1.6;
+        }
+
+        /* Typography */
+        .content-area h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .content-area h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            color: #ff4757;
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(255, 71, 87, 0.3);
+        }
+
+        .content-area h3 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3rem;
+            color: #00ffff;
+            margin: 1.5rem 0 1rem;
+        }
+
+        .content-area p {
+            margin-bottom: 1rem;
+            color: #ccc;
+        }
+
+        .content-area ul, .content-area ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        .content-area li {
+            margin-bottom: 0.5rem;
+            color: #ccc;
+        }
+
+        /* Code Blocks */
+        .content-area pre {
+            background: rgba(0, 20, 30, 0.8);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            backdrop-filter: blur(10px);
+        }
+
+        .content-area code {
+            font-family: 'Courier New', monospace;
+            color: #00ffff;
+            font-size: 0.9rem;
+        }
+
+        .content-area p code {
+            background: rgba(0, 40, 60, 0.5);
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.85rem;
+        }
+
+        /* Notes */
+        .note {
+            background: rgba(0, 100, 150, 0.2);
+            border: 1px solid rgba(0, 150, 200, 0.4);
+            border-left: 4px solid #0096c7;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .note-title {
+            font-weight: 600;
+            color: #0096c7;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .note-content {
+            color: #ccc;
+        }
+
+        /* Warning/Alert Notes */
+        .note.warning {
+            background: rgba(255, 193, 7, 0.1);
+            border-color: rgba(255, 193, 7, 0.4);
+            border-left-color: #ffc107;
+        }
+
+        .note.warning .note-title {
+            color: #ffc107;
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+            gap: 1rem;
+        }
+
+        .nav-button {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            background: rgba(0, 40, 60, 0.3);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 8px;
+            color: #00ffff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            min-width: 120px;
+        }
+
+        .nav-button:hover {
+            background: rgba(0, 60, 90, 0.5);
+            border-color: #00ffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 255, 255, 0.2);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .nav-button:disabled:hover {
+            background: rgba(0, 40, 60, 0.3);
+            border-color: rgba(0, 255, 255, 0.3);
+            transform: none;
+        }
+
+        .nav-button-icon {
+            font-size: 1rem;
+            margin: 0 0.5rem;
+        }
+
+        .nav-button-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .nav-button.next .nav-button-content {
+            align-items: flex-end;
+        }
+
+        .nav-button-label {
+            font-size: 0.7rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.2rem;
+        }
+
+        .nav-button-title {
+            font-weight: 500;
+            color: #fff;
+        }
+
+        /* Links */
+        .content-area a {
+            color: #00ffff;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .content-area a:hover {
+            border-bottom-color: #00ffff;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 280px;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .nav-button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .nav-button-content {
+                align-items: center !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>MISI DOCS</h1>
+                <p>Documentación del Proyecto</p>
+            </div>
+            
+            <div class="search-box">
+                <input type="text" placeholder="Buscar documentos..." id="searchInput">
+            </div>
+            
+            <nav class="navigation" id="navigation">
+                <!-- Navigation will be populated by JavaScript -->
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-header">
+                <div class="breadcrumb" id="breadcrumb">
+                    <a href="#" onclick="loadSection('MASTER')">🏠 Inicio</a>
+                </div>
+            </div>
+            
+            <div class="content-area" id="contentArea">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class MarkdownParser {
+            constructor() {
+                this.sections = {};
+                this.currentSection = 'MASTER';
+                this.loadMarkdownFile();
+            }
+
+            async loadMarkdownFile() {
+                try {
+                    const response = await fetch('docs.md');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const markdownContent = await response.text();
+                    this.parseMarkdown(markdownContent);
+                    
+                    // Notify that content is loaded
+                    this.notifyContentLoaded();
+                } catch (error) {
+                    console.error('Error loading docs.md:', error);
+                    // Fallback content if file can't be loaded
+                    this.parseMarkdown(this.getFallbackContent());
+                    this.notifyContentLoaded();
+                }
+            }
+
+            notifyContentLoaded() {
+                // Use a custom event to notify when content is loaded
+                const event = new CustomEvent('markdownLoaded');
+                window.dispatchEvent(event);
+            }
+
+            getFallbackContent() {
+                return `# MASTER
+
+Bienvenido a la documentación de MISI. 
+
+> Error: No se pudo cargar el archivo docs.md. Asegúrate de que el archivo existe en el directorio raíz.
+
+Para usar esta documentación:
+
+1. Crea un archivo llamado \`docs.md\` en el mismo directorio que este HTML
+2. Escribe tu documentación usando el formato Markdown especificado
+3. Recarga la página
+
+## Formato esperado
+
+\`\`\`markdown
+# MASTER
+Contenido de la página principal...
+
+# SECCIÓN PRINCIPAL
+## Subsección
+### Subsubsección
+
+> Nota: Esto es una nota
+\`\`\`
+
+# EJEMPLO
+
+## Instalación
+
+Para comenzar, necesitas:
+
+- Godot Engine 4.x
+- Este proyecto
+- Un archivo docs.md
+
+## Configuración
+
+Simplemente coloca tu archivo \`docs.md\` junto a este HTML.`;
+            }
+
+            parseMarkdown(content) {
+                const lines = content.split('\n');
+                let currentSection = 'MASTER';
+                let currentSubsection = null;
+                let currentSubsubsection = null;
+                let currentContent = [];
+                let inCodeBlock = false;
+
+                for (let line of lines) {
+                    // Check if we're entering or leaving a code block
+                    if (line.trim().startsWith('```')) {
+                        inCodeBlock = !inCodeBlock;
+                        currentContent.push(line);
+                        continue;
+                    }
+
+                    // If we're in a code block, don't parse headers
+                    if (inCodeBlock) {
+                        currentContent.push(line);
+                        continue;
+                    }
+
+                    if (line.startsWith('# ')) {
+                        // Save previous content
+                        if (currentContent.length > 0) {
+                            this.saveContent(currentSection, currentSubsection, currentSubsubsection, currentContent);
+                        }
+                        
+                        // Start new section
+                        currentSection = line.substring(2).trim();
+                        currentSubsection = null;
+                        currentSubsubsection = null;
+                        currentContent = [];
+                        
+                        if (!this.sections[currentSection]) {
+                            this.sections[currentSection] = { content: [], subsections: {} };
+                        }
+                    } else if (line.startsWith('## ')) {
+                        // Save previous content
+                        if (currentContent.length > 0) {
+                            this.saveContent(currentSection, currentSubsection, currentSubsubsection, currentContent);
+                        }
+                        
+                        // Start new subsection
+                        currentSubsection = line.substring(3).trim();
+                        currentSubsubsection = null;
+                        currentContent = [];
+                        
+                        if (!this.sections[currentSection].subsections[currentSubsection]) {
+                            this.sections[currentSection].subsections[currentSubsection] = { content: [], subsubsections: {} };
+                        }
+                    } else if (line.startsWith('### ')) {
+                        // Save previous content
+                        if (currentContent.length > 0) {
+                            this.saveContent(currentSection, currentSubsection, currentSubsubsection, currentContent);
+                        }
+                        
+                        // Start new subsubsection
+                        currentSubsubsection = line.substring(4).trim();
+                        currentContent = [line]; // Include the header
+                        
+                        if (currentSubsection && this.sections[currentSection].subsections[currentSubsection]) {
+                            if (!this.sections[currentSection].subsections[currentSubsection].subsubsections[currentSubsubsection]) {
+                                this.sections[currentSection].subsections[currentSubsection].subsubsections[currentSubsubsection] = { content: [] };
+                            }
+                        }
+                    } else {
+                        currentContent.push(line);
+                    }
+                }
+                
+                // Save last section
+                if (currentContent.length > 0) {
+                    this.saveContent(currentSection, currentSubsection, currentSubsubsection, currentContent);
+                }
+            }
+
+            saveContent(section, subsection, subsubsection, content) {
+                if (subsubsection && subsection) {
+                    if (this.sections[section] && this.sections[section].subsections[subsection] && this.sections[section].subsections[subsection].subsubsections[subsubsection]) {
+                        this.sections[section].subsections[subsection].subsubsections[subsubsection].content = content;
+                    }
+                } else if (subsection) {
+                    if (this.sections[section] && this.sections[section].subsections[subsection]) {
+                        this.sections[section].subsections[subsection].content = content;
+                    }
+                } else {
+                    if (this.sections[section]) {
+                        this.sections[section].content = content;
+                    }
+                }
+            }
+
+            renderContent(content) {
+                let html = '';
+                let inCodeBlock = false;
+                let codeContent = '';
+
+                for (let line of content) {
+                    if (line.trim().startsWith('```')) {
+                        if (inCodeBlock) {
+                            // End code block
+                            html += `<pre><code>${this.escapeHtml(codeContent.trim())}</code></pre>`;
+                            codeContent = '';
+                            inCodeBlock = false;
+                        } else {
+                            // Start code block
+                            inCodeBlock = true;
+                        }
+                        continue;
+                    }
+
+                    if (inCodeBlock) {
+                        codeContent += line + '\n';
+                        continue;
+                    }
+
+                    if (line.startsWith('### ')) {
+                        html += `<h3>${line.substring(4)}</h3>`;
+                    } else if (line.startsWith('#### ')) {
+                        html += `<h4>${line.substring(5)}</h4>`;
+                    } else if (line.startsWith('> ')) {
+                        const noteContent = line.substring(2);
+                        const [title, ...contentParts] = noteContent.split(':');
+                        const content = contentParts.join(':').trim();
+                        
+                        const noteClass = title.toLowerCase().includes('warning') || title.toLowerCase().includes('attention') ? 'warning' : '';
+                        html += `<div class="note ${noteClass}">
+                                    <div class="note-title">${title.trim()}</div>
+                                    <div class="note-content">${content}</div>
+                                </div>`;
+                    } else if (line.startsWith('- ') || line.startsWith('* ')) {
+                        html += `<ul><li>${this.processInlineFormatting(line.substring(2))}</li></ul>`;
+                    } else if (line.match(/^\d+\. /)) {
+                        html += `<ol><li>${this.processInlineFormatting(line.replace(/^\d+\. /, ''))}</li></ol>`;
+                    } else if (line.trim() !== '') {
+                        html += `<p>${this.processInlineFormatting(line)}</p>`;
+                    }
+                }
+
+                return html;
+            }
+
+            processInlineFormatting(text) {
+                // Bold
+                text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                // Italic
+                text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                // Inline code
+                text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+                // Links
+                text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+                
+                return text;
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        class DocumentationApp {
+            constructor() {
+                this.parser = null;
+                this.currentSection = 'MASTER';
+                this.currentSubsection = null;
+                this.contentLoaded = false;
+                this.expandedSubsections = new Set();
+                this.navigationOrder = [];
+                this.currentNavIndex = 0;
+                this.init();
+            }
+
+            init() {
+                this.setupSearch();
+                this.showLoadingMessage();
+                this.setupURLRouting();
+                
+                // Listen for when markdown content is loaded
+                window.addEventListener('markdownLoaded', () => {
+                    this.onContentLoaded();
+                });
+                
+                // Create parser (will trigger the event when loaded)
+                this.parser = new MarkdownParser();
+            }
+
+            setupURLRouting() {
+                // Listen for browser back/forward buttons
+                window.addEventListener('popstate', (e) => {
+                    this.handleRouteFromURL();
+                });
+
+                // Check URL on load
+                this.handleRouteFromURL();
+            }
+
+            handleRouteFromURL() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const section = urlParams.get('section');
+                const subsection = urlParams.get('subsection');
+
+                if (section && this.contentLoaded) {
+                    if (subsection) {
+                        this.loadSubsection(section, subsection, false);
+                    } else {
+                        this.loadSection(section, false);
+                    }
+                } else if (this.contentLoaded) {
+                    this.loadSection('MASTER', false);
+                }
+            }
+
+            updateURL(section, subsection = null) {
+                const url = new URL(window.location);
+                
+                if (section === 'MASTER') {
+                    url.searchParams.delete('section');
+                    url.searchParams.delete('subsection');
+                } else {
+                    url.searchParams.set('section', section);
+                    if (subsection) {
+                        url.searchParams.set('subsection', subsection);
+                    } else {
+                        url.searchParams.delete('subsection');
+                    }
+                }
+
+                window.history.pushState({}, '', url);
+            }
+
+            showLoadingMessage() {
+                const contentArea = document.getElementById('contentArea');
+                contentArea.innerHTML = `
+                    <div style="text-align: center; padding: 4rem;">
+                        <h1>Cargando documentación...</h1>
+                        <p>Leyendo archivo docs.md</p>
+                        <div style="margin-top: 2rem;">
+                            <div style="width: 100%; background: rgba(0,40,60,0.3); height: 4px; border-radius: 2px;">
+                                <div style="width: 30%; background: #00ffff; height: 100%; border-radius: 2px; animation: loading 2s infinite;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <style>
+                        @keyframes loading {
+                            0% { width: 30%; }
+                            50% { width: 70%; }
+                            100% { width: 30%; }
+                        }
+                    </style>
+                `;
+            }
+
+            onContentLoaded() {
+                this.contentLoaded = true;
+                this.buildNavigationOrder();
+                this.renderNavigation();
+                this.handleRouteFromURL();
+            }
+
+            buildNavigationOrder() {
+                this.navigationOrder = [];
+                
+                // Add MASTER as first item
+                this.navigationOrder.push({ section: 'MASTER', subsection: null });
+                
+                // Add all sections and subsections in order
+                for (let [sectionName, sectionData] of Object.entries(this.parser.sections)) {
+                    if (sectionName === 'MASTER') continue;
+                    
+                    // Add main section
+                    this.navigationOrder.push({ section: sectionName, subsection: null });
+                    
+                    // Add all subsections
+                    for (let [subsectionName, subsectionData] of Object.entries(sectionData.subsections)) {
+                        this.navigationOrder.push({ section: sectionName, subsection: subsectionName });
+                    }
+                }
+            }
+
+            getCurrentNavIndex() {
+                return this.navigationOrder.findIndex(item => 
+                    item.section === this.currentSection && item.subsection === this.currentSubsection
+                );
+            }
+
+            navigatePrevious() {
+                const currentIndex = this.getCurrentNavIndex();
+                if (currentIndex > 0) {
+                    const prevItem = this.navigationOrder[currentIndex - 1];
+                    if (prevItem.subsection) {
+                        this.loadSubsection(prevItem.section, prevItem.subsection);
+                    } else {
+                        this.loadSection(prevItem.section);
+                    }
+                }
+            }
+
+            navigateNext() {
+                const currentIndex = this.getCurrentNavIndex();
+                if (currentIndex < this.navigationOrder.length - 1) {
+                    const nextItem = this.navigationOrder[currentIndex + 1];
+                    if (nextItem.subsection) {
+                        this.loadSubsection(nextItem.section, nextItem.subsection);
+                    } else {
+                        this.loadSection(nextItem.section);
+                    }
+                }
+            }
+
+            renderNavigationButtons() {
+                const currentIndex = this.getCurrentNavIndex();
+                const hasPrevious = currentIndex > 0;
+                const hasNext = currentIndex < this.navigationOrder.length - 1;
+                
+                const prevItem = hasPrevious ? this.navigationOrder[currentIndex - 1] : null;
+                const nextItem = hasNext ? this.navigationOrder[currentIndex + 1] : null;
+
+                let html = '<div class="nav-buttons">';
+                
+                // Previous button
+                if (hasPrevious && prevItem) {
+                    const prevTitle = prevItem.subsection || prevItem.section;
+                    html += `
+                        <button class="nav-button prev" onclick="app.navigatePrevious()">
+                            <span class="nav-button-icon">←</span>
+                            <div class="nav-button-content">
+                                <span class="nav-button-label">Anterior</span>
+                                <span class="nav-button-title">${prevTitle}</span>
+                            </div>
+                        </button>`;
+                } else {
+                    html += `
+                        <button class="nav-button prev" disabled>
+                            <span class="nav-button-icon">←</span>
+                            <div class="nav-button-content">
+                                <span class="nav-button-label">Anterior</span>
+                                <span class="nav-button-title">No disponible</span>
+                            </div>
+                        </button>`;
+                }
+                
+                // Next button
+                if (hasNext && nextItem) {
+                    const nextTitle = nextItem.subsection || nextItem.section;
+                    html += `
+                        <button class="nav-button next" onclick="app.navigateNext()">
+                            <div class="nav-button-content">
+                                <span class="nav-button-label">Siguiente</span>
+                                <span class="nav-button-title">${nextTitle}</span>
+                            </div>
+                            <span class="nav-button-icon">→</span>
+                        </button>`;
+                } else {
+                    html += `
+                        <button class="nav-button next" disabled>
+                            <div class="nav-button-content">
+                                <span class="nav-button-label">Siguiente</span>
+                                <span class="nav-button-title">No disponible</span>
+                            </div>
+                            <span class="nav-button-icon">→</span>
+                        </button>`;
+                }
+                
+                html += '</div>';
+                return html;
+            }
+
+            renderNavigation() {
+                if (!this.contentLoaded || !this.parser) return;
+                
+                const nav = document.getElementById('navigation');
+                nav.innerHTML = '';
+
+                for (let [sectionName, sectionData] of Object.entries(this.parser.sections)) {
+                    if (sectionName === 'MASTER') continue;
+
+                    const sectionDiv = document.createElement('div');
+                    sectionDiv.className = 'nav-section';
+
+                    const header = document.createElement('div');
+                    header.className = 'nav-header';
+                    
+                    header.addEventListener('click', () => this.toggleSection(sectionName));
+
+                    const arrow = document.createElement('span');
+                    arrow.className = 'nav-arrow';
+                    arrow.textContent = '▶';
+
+                    const title = document.createElement('span');
+                    title.className = 'nav-title';
+                    title.textContent = sectionName;
+
+                    header.appendChild(arrow);
+                    header.appendChild(title);
+
+                    const itemsContainer = document.createElement('div');
+                    itemsContainer.className = 'nav-items';
+                    itemsContainer.id = `nav-${sectionName}`;
+
+                    // Add subsections
+                    for (let [subsectionName, subsectionData] of Object.entries(sectionData.subsections)) {
+                        const item = document.createElement('div');
+                        item.className = 'nav-item';
+                        
+                        const itemContent = document.createElement('div');
+                        itemContent.className = 'nav-item-content';
+
+                        const icon = document.createElement('span');
+                        icon.className = 'nav-item-icon';
+                        icon.textContent = '📄';
+
+                        const text = document.createElement('span');
+                        text.className = 'nav-item-text';
+                        text.textContent = subsectionName;
+
+                        itemContent.appendChild(icon);
+                        itemContent.appendChild(text);
+                        item.appendChild(itemContent);
+
+                        // Check if there are subsubsections
+                        const hasSubsections = subsectionData.subsubsections && Object.keys(subsectionData.subsubsections).length > 0;
+                        
+                        if (hasSubsections) {
+                            // Add toggle button
+                            const toggle = document.createElement('span');
+                            toggle.className = 'nav-item-toggle';
+                            toggle.textContent = '▶';
+                            item.appendChild(toggle);
+
+                            // Create subsubsections container
+                            const subContainer = document.createElement('div');
+                            subContainer.className = 'nav-subitems';
+                            subContainer.id = `subnav-${sectionName}-${subsectionName}`;
+
+                            for (let [subsubsectionName, subsubsectionData] of Object.entries(subsectionData.subsubsections)) {
+                                const subItem = document.createElement('div');
+                                subItem.className = 'nav-subitem';
+
+                                subItem.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    this.scrollToSubsubsection(sectionName, subsectionName, subsubsectionName);
+                                });
+
+                                const subIcon = document.createElement('span');
+                                subIcon.className = 'nav-subitem-icon';
+                                subIcon.textContent = '▸';
+
+                                const subText = document.createElement('span');
+                                subText.className = 'nav-subitem-text';
+                                subText.textContent = subsubsectionName;
+
+                                subItem.appendChild(subIcon);
+                                subItem.appendChild(subText);
+                                subContainer.appendChild(subItem);
+                            }
+
+                            // Add the subcontainer after the main item
+                            itemsContainer.appendChild(item);
+                            itemsContainer.appendChild(subContainer);
+
+                            // Add click handler for the entire item (both content and toggle)
+                            item.addEventListener('click', (e) => {
+                                // Check if we clicked the toggle specifically
+                                if (e.target.classList.contains('nav-item-toggle')) {
+                                    this.toggleSubsection(sectionName, subsectionName);
+                                } else if (!e.target.closest('.nav-subitems')) {
+                                    // If we didn't click on a subitem, toggle and load
+                                    this.toggleSubsection(sectionName, subsectionName);
+                                    this.loadSubsection(sectionName, subsectionName);
+                                }
+                            });
+                        } else {
+                            // No subsubsections, just add click handler to load subsection
+                            item.addEventListener('click', () => {
+                                this.loadSubsection(sectionName, subsectionName);
+                            });
+                            
+                            // Add the item normally
+                            itemsContainer.appendChild(item);
+                        }
+                    }
+
+                    sectionDiv.appendChild(header);
+                    sectionDiv.appendChild(itemsContainer);
+                    nav.appendChild(sectionDiv);
+                }
+            }
+
+            toggleSection(sectionName) {
+                const items = document.getElementById(`nav-${sectionName}`);
+                if (!items) return;
+
+                const header = items.previousElementSibling;
+                const arrow = header ? header.querySelector('.nav-arrow') : null;
+
+                if (!header || !arrow) return;
+
+                if (items.classList.contains('expanded')) {
+                    items.classList.remove('expanded');
+                    arrow.classList.remove('expanded');
+                    header.classList.remove('active');
+                } else {
+                    // Close all other sections
+                    document.querySelectorAll('.nav-items').forEach(el => el.classList.remove('expanded'));
+                    document.querySelectorAll('.nav-arrow').forEach(el => el.classList.remove('expanded'));
+                    document.querySelectorAll('.nav-header').forEach(el => el.classList.remove('active'));
+
+                    items.classList.add('expanded');
+                    arrow.classList.add('expanded');
+                    header.classList.add('active');
+                }
+            }
+
+            toggleSubsection(sectionName, subsectionName) {
+                const subnavId = `subnav-${sectionName}-${subsectionName}`;
+                const subnav = document.getElementById(subnavId);
+                
+                if (!subnav) return;
+
+                // Find the toggle button for this specific subsection
+                const navSection = document.getElementById(`nav-${sectionName}`);
+                if (!navSection) return;
+
+                const navItems = navSection.querySelectorAll('.nav-item');
+                let targetToggle = null;
+                
+                navItems.forEach(item => {
+                    const textElement = item.querySelector('.nav-item-text');
+                    if (textElement && textElement.textContent === subsectionName) {
+                        targetToggle = item.querySelector('.nav-item-toggle');
+                    }
+                });
+
+                if (!targetToggle) return;
+
+                const subsectionKey = `${sectionName}-${subsectionName}`;
+
+                if (this.expandedSubsections.has(subsectionKey)) {
+                    // Collapse this subsection
+                    subnav.classList.remove('expanded');
+                    targetToggle.classList.remove('expanded');
+                    this.expandedSubsections.delete(subsectionKey);
+                } else {
+                    // Collapse all other subsections first (only within the same section)
+                    const currentSectionExpanded = Array.from(this.expandedSubsections).filter(key => key.startsWith(sectionName + '-'));
+                    
+                    currentSectionExpanded.forEach(key => {
+                        const [sec, subsec] = key.split('-');
+                        if (sec === sectionName) {
+                            const otherSubnav = document.getElementById(`subnav-${sec}-${subsec}`);
+                            const otherNavItems = navSection.querySelectorAll('.nav-item');
+                            
+                            otherNavItems.forEach(item => {
+                                const textElement = item.querySelector('.nav-item-text');
+                                if (textElement && textElement.textContent === subsec) {
+                                    const otherToggle = item.querySelector('.nav-item-toggle');
+                                    if (otherToggle) otherToggle.classList.remove('expanded');
+                                }
+                            });
+                            
+                            if (otherSubnav) otherSubnav.classList.remove('expanded');
+                            this.expandedSubsections.delete(key);
+                        }
+                    });
+
+                    // Expand this subsection
+                    subnav.classList.add('expanded');
+                    targetToggle.classList.add('expanded');
+                    this.expandedSubsections.add(subsectionKey);
+                }
+            }
+
+            loadSection(sectionName, updateURL = true) {
+                if (!this.contentLoaded || !this.parser) return;
+                
+                this.currentSection = sectionName;
+                this.currentSubsection = null;
+                
+                const sectionData = this.parser.sections[sectionName];
+                if (!sectionData) return;
+
+                const contentArea = document.getElementById('contentArea');
+                let html = '';
+
+                if (sectionName !== 'MASTER') {
+                    html += `<h1>${sectionName}</h1>`;
+                }
+
+                html += this.parser.renderContent(sectionData.content);
+                html += this.renderNavigationButtons();
+                contentArea.innerHTML = html;
+
+                if (updateURL) {
+                    this.updateURL(sectionName);
+                }
+                
+                this.updateBreadcrumb();
+                this.updateActiveNavigation();
+            }
+
+            loadSubsection(sectionName, subsectionName, updateURL = true) {
+                if (!this.contentLoaded || !this.parser) return;
+                
+                this.currentSection = sectionName;
+                this.currentSubsection = subsectionName;
+
+                const subsectionData = this.parser.sections[sectionName].subsections[subsectionName];
+                if (!subsectionData) return;
+
+                const contentArea = document.getElementById('contentArea');
+                let html = `<h1>${sectionName}</h1>`;
+                html += `<h2>${subsectionName}</h2>`;
+                
+                // Add main subsection content
+                html += this.parser.renderContent(subsectionData.content);
+
+                // Add all subsubsections with their content
+                for (let [subsubsectionName, subsubsectionData] of Object.entries(subsectionData.subsubsections || {})) {
+                    html += `<div id="subsubsection-${this.createAnchorId(subsubsectionName)}">`;
+                    html += this.parser.renderContent(subsubsectionData.content);
+                    html += '</div>';
+                }
+
+                html += this.renderNavigationButtons();
+                contentArea.innerHTML = html;
+                
+                if (updateURL) {
+                    this.updateURL(sectionName, subsectionName);
+                }
+                
+                this.updateBreadcrumb();
+                this.updateActiveNavigation();
+            }
+
+            scrollToSubsubsection(sectionName, subsectionName, subsubsectionName) {
+                // First load the subsection if not already loaded
+                if (this.currentSection !== sectionName || this.currentSubsection !== subsectionName) {
+                    this.loadSubsection(sectionName, subsectionName);
+                    
+                    // Wait a bit for content to load, then scroll
+                    setTimeout(() => {
+                        this.performScrollToSubsubsection(subsubsectionName);
+                    }, 100);
+                } else {
+                    this.performScrollToSubsubsection(subsubsectionName);
+                }
+            }
+
+            performScrollToSubsubsection(subsubsectionName) {
+                const anchorId = this.createAnchorId(subsubsectionName);
+                const element = document.getElementById(`subsubsection-${anchorId}`);
+                
+                if (element) {
+                    element.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                    
+                    // Add a temporary highlight
+                    element.style.transition = 'background-color 0.5s ease';
+                    element.style.backgroundColor = 'rgba(0, 255, 255, 0.1)';
+                    
+                    setTimeout(() => {
+                        element.style.backgroundColor = 'transparent';
+                    }, 2000);
+                }
+            }
+
+            createAnchorId(text) {
+                return text.toLowerCase()
+                    .replace(/[^\w\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .trim();
+            }
+
+            updateBreadcrumb() {
+                const breadcrumb = document.getElementById('breadcrumb');
+                let html = '<a href="#" onclick="app.loadSection(\'MASTER\')">🏠 Inicio</a>';
+
+                if (this.currentSection !== 'MASTER') {
+                    html += ` / <a href="#" onclick="app.loadSection('${this.currentSection}')">${this.currentSection}</a>`;
+                    
+                    if (this.currentSubsection) {
+                        html += ` / ${this.currentSubsection}`;
+                    }
+                }
+
+                breadcrumb.innerHTML = html;
+            }
+
+            updateActiveNavigation() {
+                // Remove all active states
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+                if (this.currentSubsection) {
+                    // Find and activate the current subsection
+                    const navItems = document.querySelectorAll('.nav-item');
+                    navItems.forEach(item => {
+                        const textElement = item.querySelector('.nav-item-text');
+                        if (textElement && textElement.textContent === this.currentSubsection) {
+                            item.classList.add('active');
+                        }
+                    });
+                }
+            }
+
+            setupSearch() {
+                const searchInput = document.getElementById('searchInput');
+                searchInput.addEventListener('input', (e) => {
+                    const query = e.target.value.toLowerCase();
+                    this.filterNavigation(query);
+                });
+            }
+
+            filterNavigation(query) {
+                const navSections = document.querySelectorAll('.nav-section');
+                
+                navSections.forEach(section => {
+                    const titleElement = section.querySelector('.nav-title');
+                    const sectionTitle = titleElement ? titleElement.textContent.toLowerCase() : '';
+                    const navItems = section.querySelectorAll('.nav-item');
+                    let sectionVisible = false;
+
+                    if (sectionTitle.includes(query)) {
+                        section.style.display = 'block';
+                        sectionVisible = true;
+                    } else {
+                        navItems.forEach(item => {
+                            const textElement = item.querySelector('.nav-item-text');
+                            const itemText = textElement ? textElement.textContent.toLowerCase() : '';
+                            if (itemText.includes(query)) {
+                                item.style.display = 'flex';
+                                sectionVisible = true;
+                            } else {
+                                item.style.display = query ? 'none' : 'flex';
+                            }
+                        });
+                    }
+
+                    section.style.display = sectionVisible ? 'block' : 'none';
+                    
+                    if (sectionVisible && query) {
+                        // Auto-expand sections with matches
+                        const items = section.querySelector('.nav-items');
+                        const arrow = section.querySelector('.nav-arrow');
+                        const header = section.querySelector('.nav-header');
+                        
+                        if (items) items.classList.add('expanded');
+                        if (arrow) arrow.classList.add('expanded');
+                        if (header) header.classList.add('active');
+                    }
+                });
+
+                if (!query) {
+                    // Reset all when search is cleared
+                    document.querySelectorAll('.nav-items').forEach(el => el.classList.remove('expanded'));
+                    document.querySelectorAll('.nav-arrow').forEach(el => el.classList.remove('expanded'));
+                    document.querySelectorAll('.nav-header').forEach(el => el.classList.remove('active'));
+                    
+                    // Also reset expanded subsections
+                    this.expandedSubsections.clear();
+                    document.querySelectorAll('.nav-subitems').forEach(el => el.classList.remove('expanded'));
+                    document.querySelectorAll('.nav-item-toggle').forEach(el => el.classList.remove('expanded'));
+                }
+            }
+        }
+
+        // Initialize the app
+        let app;
+        document.addEventListener('DOMContentLoaded', () => {
+            app = new DocumentationApp();
+        });
+
+        // Global functions for onclick handlers
+        function loadSection(sectionName) {
+            app.loadSection(sectionName);
+        }
+
+        function loadSubsection(sectionName, subsectionName) {
+            app.loadSubsection(sectionName, subsectionName);
+        }
+    </script>
+</body>
+</html>

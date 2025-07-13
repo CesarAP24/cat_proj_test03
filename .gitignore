@@ -1,3 +1,7 @@
 .godot/**
 !.godot/project.godot
 !.godot/export_presets.cfg
+
+.source_godot/godot/**
+!.source_godot/godot/project.godot
+!.source_godot/godot/export_presets.cfg

@@ -1,8 +1,0 @@
-[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://bbqe3rqkaav78"]
-
-[ext_resource type="Texture2D" uid="uid://cp1lxnl52evj6" path="res://textures/tiles_roughness.jpg" id="1_y4rku"]
-
-[resource]
-albedo_color = Color(0.238056, 0.0901954, 0.0406316, 1)
-roughness_texture = ExtResource("1_y4rku")
-roughness_texture_channel = 4

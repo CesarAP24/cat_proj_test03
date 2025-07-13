@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MISI - Simulación Felina en Godot</title>
+    <link rel="stylesheet" href="./web_src/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="corner-frame top-left"></div>
+    <div class="corner-frame top-right"></div>
+    <div class="corner-frame bottom-left"></div>
+    <div class="corner-frame bottom-right"></div>
+    
+    <div class="container">
+        <div class="cat">
+            <img src="./web_src/images/car.png" alt="silueta_cat">
+        </div>
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="cat-silhouette">
+                <img src="./web_src/images/logo.png" alt="logo">
+            </div>
+        </div>
+        
+        <!-- Menu Section -->
+        <div class="menu-section">
+            <div class="menu-item active">
+                <span class="menu-icon">[>]</span>
+                <span class="menu-text">INICIAR EXPLORACIÓN</span>
+            </div>
+            
+            <div class="menu-item">
+                <span class="menu-icon">[◆]</span>
+                <span class="menu-text">GALERÍA DE RENDERS</span>
+            </div>
+            
+            <div class="menu-item">
+                <span class="menu-icon">[⚡]</span>
+                <span class="menu-text">ESPECIFICACIONES TÉCNICAS</span>
+            </div>
+            
+            <div class="menu-item">
+                <span class="menu-icon">[📁]</span>
+                <span class="menu-text">ARCHIVOS DEL SISTEMA</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Content Sections (Initially Hidden) -->
+    <div class="content-section" id="exploration">
+        <div class="content-container">
+            <h2>Simulación Felina Avanzada</h2>
+            <p>Experimenta comportamientos realistas de gatos en entornos urbanos procedurales inspirados en Cusco.</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>IA Comportamental</h3>
+                    <p>Actitudes dinámicas que se adaptan al entorno sin animaciones predefinidas</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>Generación Procedural</h3>
+                    <p>Ciudades tipo Cusco generadas algorítmicamente para exploración infinita</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>Física Realista</h3>
+                    <p>Saltos entre techos, equilibrio y movimientos naturales felinos</p>
+                </div>
+            </div>
+
+            <div>
+                <br>
+                <div class="feature-card">
+                    <h3>Documentación del código</h3>
+                    <p>Para leer más detalles sobre el código, puedes consultar la <a href="documentacion.html" target="_blank">documentación completa</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="content-section" id="gallery">
+        <div class="content-container">
+            <h2>Galería de Renders</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <img src="car.png" alt="Gato en techo nocturno" />
+                    <p>Ambiente nocturno con luna llena</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="fondo.png" alt="Gato explorando techos" />
+                    <p>Navegación entre tejados coloniales</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="image3.png" alt="Vista urbana nocturna" />
+                    <p>Entorno urbano atmosférico</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="content-section" id="specs">
+        <div class="content-container">
+            <h2>Especificaciones Técnicas</h2>
+            <div class="tech-specs">
+                <div class="spec-category">
+                    <h3>Motor de Juego</h3>
+                    <ul>
+                        <li>Godot Engine 4.x</li>
+                        <li>GDScript para lógica comportamental</li>
+                        <li>Sistema de física 3D avanzado</li>
+                    </ul>
+                </div>
+                
+                <div class="spec-category">
+                    <h3>Sistemas Implementados</h3>
+                    <ul>
+                        <li>Sistema de movimiento felino dinámico</li>
+                        <li>Generador de ciudades Voronoi</li>
+                        <li>Sistema de cola física</li>
+                    </ul>
+                </div>
+                
+                <div class="spec-category">
+                    <h3>Características</h3>
+                    <ul>
+                        <li>Comportamientos no-scripted</li>
+                        <li>Mapas hiperrealistas | Para demostraciones</li>
+                        <li>Ciudad Cusco infinita</li>
+                        <li>Dia o Noche</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="content-section" id="files">
+        <div class="content-container">
+            <h2>Archivos del Sistema</h2>
+            <div class="file-structure">
+                <div class="folder">
+                    <span class="folder-icon">[📁]</span>
+                    <span>MISI-SIMULATION/</span>
+                    <div class="folder-content">
+                        <div class="file"><span class="file-icon">[📄]</span> main.gd</div>
+                        <div class="file"><span class="file-icon">[📄]</span> VoronoiGenerator.gd</div>
+                        <div class="file"><span class="file-icon">[🎥]</span> demo_nocturno.mp4</div>
+                        <div class="file"><span class="file-icon">[📸]</span> renders/</div>
+                        <div class="file"><span class="file-icon">[📋]</span> documentacion.pdf</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./web_src/script.js"></script>
+</body>
+</html>

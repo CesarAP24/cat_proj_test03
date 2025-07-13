@@ -1,0 +1,13 @@
+res://default_env.tres
+res://tests/city_test_night.tscn
+res://addons/so_fluffy/turbulence_default.tres
+res://addons/so_fluffy/so_fluffy.gdshader
+res://materials/window_material.tres
+res://materials/frame_material.tres
+res://assets/cielo/stylized-sky.gdshader
+res://tests/test03.tscn
+res://tests/city_test_day.tscn
+res://assets/cielo/Day.tscn
+res://tests/menu.tscn
+res://assets/black_model.tscn
+res://tests/abandoned.tscn
