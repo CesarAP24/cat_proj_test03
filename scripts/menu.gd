@@ -8,4 +8,4 @@ func _ready():
 	primer_boton.grab_focus()
 
 func _on_jugar_pressed():
-	get_tree().change_scene_to_file("res://tests/abandoned.tscn")
+	get_tree().change_scene_to_file("res://tests/city_test_night.tscn")

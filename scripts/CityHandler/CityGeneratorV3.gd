@@ -548,8 +548,8 @@ func create_terrain_mesh_for_chunk(start_x: float, start_z: float, chunk_size: i
 			
 			# MISMA lógica que HouseBuilder
 			var noise_value = terrain_noise.get_noise_2d(world_x, world_z)
-			var min_offset = -10.0
-			var max_offset = 0.0
+			var min_offset = -50.0
+			var max_offset = 50.0
 			var height = min_offset + (noise_value + 1.0) * 0.5 * (max_offset - min_offset) - 50
 			
 			vertices.append(Vector3(world_x, height, world_z))

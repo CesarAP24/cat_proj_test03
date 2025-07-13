@@ -1,8 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://mmk0xre0slh7"]
+[gd_scene load_steps=9 format=3 uid="uid://mmk0xre0slh7"]
 
-[ext_resource type="Script" uid="uid://8nb11l1l4a15" path="res://tests/menu.gd" id="1_f7jwa"]
+[ext_resource type="Script" uid="uid://8nb11l1l4a15" path="res://scripts/menu.gd" id="1_f7jwa"]
 [ext_resource type="Texture2D" uid="uid://t0rqmt8rhu82" path="res://assets/car.png" id="2_f7jwa"]
 [ext_resource type="Texture2D" uid="uid://4ujdmaacecqx" path="res://assets/logo.png" id="2_kn4nj"]
+[ext_resource type="Texture2D" uid="uid://c5xcu7k6yghfk" path="res://textures/fondo.png" id="2_qafqv"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f7jwa"]
 bg_color = Color(0.301961, 0.909804, 0.941176, 1)
@@ -49,14 +50,15 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_f7jwa")
 
-[node name="ColorRect" type="ColorRect" parent="."]
-layout_mode = 2
-offset_left = -3.0
-offset_top = -4.0
-offset_right = 1020.0
-offset_bottom = 644.0
-rotation = -0.000942025
-color = Color(5.41471e-08, 0.0737619, 0.22693, 1)
+[node name="TextureRect3" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 3.05176e-05
+offset_top = -0.999939
+offset_right = 936.0
+offset_bottom = 627.0
+scale = Vector2(1.09526, 1.03058)
+texture = ExtResource("2_qafqv")
+expand_mode = 1
 
 [node name="TextureRect" type="TextureRect" parent="."]
 layout_mode = 0
@@ -210,10 +212,10 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_6muo2")
 
 [node name="Label" type="Label" parent="Buscador/mandarSeed"]
 layout_mode = 0
-offset_left = 11.0
-offset_top = 5.0
-offset_right = 79.0
-offset_bottom = 60.0
+offset_left = 19.0
+offset_top = 3.0
+offset_right = 87.0
+offset_bottom = 58.0
 theme_override_font_sizes/font_size = 40
 text = "→"
 

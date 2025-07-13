@@ -6,18 +6,6 @@
 [node name="black" instance=ExtResource("1_3ah2f")]
 script = ExtResource("2_o73ox")
 
-[node name="t_backL" type="Marker3D" parent="metarig" index="1"]
-
-[node name="t_backR" type="Marker3D" parent="metarig" index="2"]
-
-[node name="t_frontL" type="Marker3D" parent="metarig" index="3"]
-
-[node name="t_frontR" type="Marker3D" parent="metarig" index="4"]
-
-[node name="t_tail" type="Marker3D" parent="metarig" index="5"]
-
-[node name="t_tail2" type="Marker3D" parent="metarig" index="6"]
-
 [node name="ik_backL" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="1"]
 process_priority = 1
 root_bone = &"thigh.L"
@@ -73,3 +61,15 @@ tip_bone = &"tail.005"
 override_tip_basis = false
 magnet = Vector3(0, -0.57, 0)
 target_node = NodePath("../../t_tail")
+
+[node name="t_backL" type="Marker3D" parent="metarig" index="1"]
+
+[node name="t_backR" type="Marker3D" parent="metarig" index="2"]
+
+[node name="t_frontL" type="Marker3D" parent="metarig" index="3"]
+
+[node name="t_frontR" type="Marker3D" parent="metarig" index="4"]
+
+[node name="t_tail" type="Marker3D" parent="metarig" index="5"]
+
+[node name="t_tail2" type="Marker3D" parent="metarig" index="6"]
