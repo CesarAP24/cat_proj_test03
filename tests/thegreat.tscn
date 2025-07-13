@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://bo8uivitiwryg"]
 
-[ext_resource type="Script" uid="uid://c0kae6f0h1cyc" path="res://scripts/main.gd" id="1_5jofc"]
-[ext_resource type="Script" uid="uid://cyykjr8fvts8h" path="res://scripts/Camera.gd" id="2_ie6gf"]
+[ext_resource type="Script" uid="uid://c0kae6f0h1cyc" path="res://scripts/Main/main.gd" id="1_5jofc"]
+[ext_resource type="Script" uid="uid://cyykjr8fvts8h" path="res://scripts/Main/Camera.gd" id="2_ie6gf"]
 [ext_resource type="PackedScene" uid="uid://cppicxpa1x7l5" path="res://assets/black_model.tscn" id="3_upce8"]
 [ext_resource type="PackedScene" uid="uid://bcp8eepbyfgpv" path="res://assets/thegreatScene.tscn" id="4_lgwkj"]
 

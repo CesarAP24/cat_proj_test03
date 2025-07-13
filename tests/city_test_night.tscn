@@ -1,9 +1,9 @@
 [gd_scene load_steps=7 format=3 uid="uid://4j4maeatft45"]
 
 [ext_resource type="PackedScene" uid="uid://cppicxpa1x7l5" path="res://assets/black_model.tscn" id="1_iet0h"]
-[ext_resource type="Script" uid="uid://c0kae6f0h1cyc" path="res://scripts/main.gd" id="1_lkicp"]
+[ext_resource type="Script" uid="uid://c0kae6f0h1cyc" path="res://scripts/Main/main.gd" id="1_lkicp"]
 [ext_resource type="Script" uid="uid://cwbd8nb65d51j" path="res://scripts/CityHandler/CityGeneratorV3.gd" id="2_n5rus"]
-[ext_resource type="Script" uid="uid://cyykjr8fvts8h" path="res://scripts/Camera.gd" id="3_n5rus"]
+[ext_resource type="Script" uid="uid://cyykjr8fvts8h" path="res://scripts/Main/Camera.gd" id="3_n5rus"]
 [ext_resource type="Material" uid="uid://das1tcskvyg3y" path="res://materials/wall_material.tres" id="3_snnre"]
 [ext_resource type="PackedScene" uid="uid://4wn102ke0huh" path="res://assets/cielo/Night.tscn" id="5_n5rus"]
 

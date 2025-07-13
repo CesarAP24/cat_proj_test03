@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cppicxpa1x7l5"]
 
 [ext_resource type="PackedScene" uid="uid://b2dit4nr8wf6o" path="res://assets/black.glb" id="1_3ah2f"]
-[ext_resource type="Script" uid="uid://jcoxxws3n8i1" path="res://scripts/targets_cat.gd" id="2_o73ox"]
+[ext_resource type="Script" uid="uid://jcoxxws3n8i1" path="res://scripts/Main/targets_cat.gd" id="2_o73ox"]
 
 [node name="black" instance=ExtResource("1_3ah2f")]
 script = ExtResource("2_o73ox")
