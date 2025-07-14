@@ -1,3 +1,4 @@
+
 extends Node3D
 
 const ESCALA = 0.05
@@ -14,12 +15,19 @@ const RADIO = 1
 @export var UMBRAL_PATAS_BACK = 110 * ESCALA
 @export var ALTURA_PASO = 70 * ESCALA
 @export var RANDOM_DISTANCE = 0.0
-@export var MIN_HEIGHT_JUMP = 120 * ESCALA
+@export var MIN_HEIGHT_JUMP = 200 * ESCALA
 @export var MAX_HEIGHT_JUMP = 120 * 5 * ESCALA
-@export var UMBRAL_DETECCION_SALTO = 270 * ESCALA
+@export var UMBRAL_DETECCION_SALTO = 400 * ESCALA
 @export var MARGEN_SALTO_ADELANTE = 50 * ESCALA
 @export var MOVEMENT_TARGET_SPEED = 1.5
 @export var DEBUG = false
+
+# Variables para sistema de salto manual
+@export var MOSTRAR_INTENCION_SALTO = true
+var intencion_salto_activa = false
+var posicion_intencion_salto = Vector3.ZERO
+var ui_salto: Control
+var tipo_salto_detectado = "" # "up" o "down"
 
 @export var camara_path: NodePath
 var camara: Camera3D
@@ -273,9 +281,6 @@ class WalkBehavior extends BaseBehavior:
 		if dist_target > context.DISTANCIA_PARA_CORRER:
 			return "run"
 		
-		if not context.en_ciclo_salto and context.es_necesario_saltar():
-			return "jump"
-		
 		if context.debe_avanzar() and not context.validar_siguiente_paso():
 			return "walk"
 		
@@ -409,6 +414,120 @@ func _process(delta):
 	actualizar_representacion_visual()
 	manejar_movimiento_objetivo()
 	actualizar_cola(delta)
+	
+	detectar_intencion_salto()
+	manejar_input_salto()
+	actualizar_posicion_ui_salto()  # AGREGAR ESTO
+
+func detectar_intencion_salto():
+	if en_ciclo_salto:
+		return
+		
+	var centro = obtener_centro()
+	var dir_norm = direccion.normalized()
+	
+	if debe_avanzar_sin_salto():
+		for dist in range(1, 50):
+			var distancia_actual = UMBRAL_DETECCION_SALTO * dist / 50.0
+			var punto_check = centro + dir_norm * distancia_actual
+			var altura_terreno = obtener_punto_mas_alto(punto_check.x, punto_check.z, "suelo").y
+			var diferencia_altura = abs(altura_terreno - centro.y)
+			
+			if diferencia_altura > MIN_HEIGHT_JUMP && punto_check.y >= centro.y:
+				posicion_obstaculo = Vector3(punto_check.x, altura_terreno, punto_check.z)
+				activar_intencion_salto(Vector3(punto_check.x, altura_terreno, punto_check.z), "up")
+				return
+			elif diferencia_altura > MIN_HEIGHT_JUMP:
+				posicion_obstaculo = Vector3(punto_check.x, altura_terreno, punto_check.z)
+				activar_intencion_salto(Vector3(punto_check.x, altura_terreno, punto_check.z), "down")
+				return
+	
+	# No hay salto detectado
+	if posicion_obstaculo != null:
+		desactivar_intencion_salto()
+	
+func manejar_input_salto():
+	if Input.is_action_just_pressed("ui_accept") and intencion_salto_activa: # ESPACIO
+		ejecutar_salto_manual()
+		
+func ejecutar_salto_manual():
+	posicion_obstaculo = posicion_intencion_salto
+	behavior_handler.transition_to("jump")
+	desactivar_intencion_salto()
+	
+func desactivar_intencion_salto():
+	intencion_salto_activa = false
+	if ui_salto:
+		ui_salto.visible = false
+		
+func crear_ui_salto():
+	# Crear el contenedor principal (más pequeño)
+	ui_salto = Control.new()
+	ui_salto.name = "UI_Salto"
+	ui_salto.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	ui_salto.size = Vector2(80, 35)  # Más pequeño
+	
+	# Crear el fondo con borde redondeado
+	var panel = Panel.new()
+	panel.size = ui_salto.size
+	
+	# Crear StyleBox más sutil
+	var style_box = StyleBoxFlat.new()
+	style_box.bg_color = Color(0, 0, 0, 0.7)  # Negro semi-transparente
+	style_box.border_color = Color(1, 1, 1, 0.8)  # Blanco semi-transparente
+	style_box.border_width_left = 2  # Borde más delgado
+	style_box.border_width_right = 2
+	style_box.border_width_top = 2
+	style_box.border_width_bottom = 2
+	style_box.corner_radius_top_left = 8  # Menos redondeado
+	style_box.corner_radius_top_right = 8
+	style_box.corner_radius_bottom_left = 8
+	style_box.corner_radius_bottom_right = 8
+	
+	panel.add_theme_stylebox_override("panel", style_box)
+	ui_salto.add_child(panel)
+	
+	# Crear el texto "Space" más pequeño
+	var label = Label.new()
+	label.text = "Space"
+	label.add_theme_font_size_override("font_size", 14)  # Texto más pequeño
+	label.add_theme_color_override("font_color", Color(1, 1, 1, 0.9))  # Blanco semi-transparente
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.size = ui_salto.size
+	ui_salto.add_child(label)
+	
+	# Agregar a la escena
+	var scene_tree = get_tree()
+	var root = scene_tree.current_scene
+	root.add_child(ui_salto)
+	
+	ui_salto.visible = false
+	
+func activar_intencion_salto(posicion: Vector3, tipo: String):
+	intencion_salto_activa = true
+	posicion_intencion_salto = posicion
+	tipo_salto_detectado = tipo
+	
+	# Crear o actualizar UI de salto
+	if not ui_salto:
+		crear_ui_salto()
+	
+	# Convertir posición 3D a 2D en pantalla
+	if camara:
+		var pos_2d = camara.unproject_position(posicion_intencion_salto)
+		ui_salto.position = pos_2d - ui_salto.size / 2  # Centrar
+		ui_salto.visible = MOSTRAR_INTENCION_SALTO
+
+func actualizar_posicion_ui_salto():
+	if ui_salto and ui_salto.visible and camara:
+		var pos_2d = camara.unproject_position(posicion_intencion_salto)
+		ui_salto.position = pos_2d - ui_salto.size / 2
+		
+		# Mantener en pantalla
+		var viewport_size = get_viewport().get_visible_rect().size
+		ui_salto.position.x = clamp(ui_salto.position.x, 0, viewport_size.x - ui_salto.size.x)
+		ui_salto.position.y = clamp(ui_salto.position.y, 0, viewport_size.y - ui_salto.size.y)
 
 func inicializar():
 	objetivos = {
@@ -767,20 +886,16 @@ func es_necesario_saltar():
 	var centro = obtener_centro()
 	var dir_norm = direccion.normalized()
 	
-	if (debe_avanzar()):
-		for dist in range(1, 30):
-			var distancia_actual = UMBRAL_DETECCION_SALTO * dist / 30.0
+	if (debe_avanzar_sin_salto()):
+		for dist in range(1, 50):
+			var distancia_actual = UMBRAL_DETECCION_SALTO * dist / 50.0
 			var punto_check = centro + dir_norm * distancia_actual
 			punto_check.y = centro.y
 			
 			var altura_terreno = obtener_punto_mas_alto(punto_check.x, punto_check.z, "suelo").y
-			var diferencia_altura = altura_terreno - centro.y
+			var diferencia_altura = abs(altura_terreno - centro.y)
 			
 			if diferencia_altura > MIN_HEIGHT_JUMP && diferencia_altura < MAX_HEIGHT_JUMP:
-				posicion_obstaculo = Vector3(punto_check.x, altura_terreno, punto_check.z)
-				return true
-				
-			if diferencia_altura < -MIN_HEIGHT_JUMP && diferencia_altura > -MAX_HEIGHT_JUMP * 2 && dist < 10:
 				posicion_obstaculo = Vector3(punto_check.x, altura_terreno, punto_check.z)
 				return true
 	
@@ -792,17 +907,17 @@ func encontrar_borde_obstaculo():
 	var es_bajada = false
 	
 	if posicion_obstaculo == Vector3():
-		for dist in range(1, 30):
-			var distancia_actual = UMBRAL_DETECCION_SALTO * dist / 30.0
+		for dist in range(1, 50):
+			var distancia_actual = UMBRAL_DETECCION_SALTO * dist / 50.0
 			var punto_check = centro + dir_norm * distancia_actual
 			var altura_terreno = obtener_punto_mas_alto(punto_check.x, punto_check.z, "suelo").y
-			var diferencia_altura = altura_terreno - centro.y
+			var diferencia_altura = abs(altura_terreno - centro.y)
 			
-			if diferencia_altura > MIN_HEIGHT_JUMP:
+			if diferencia_altura > MIN_HEIGHT_JUMP && punto_check.y >= centro.y:
 				posicion_obstaculo = Vector3(punto_check.x, altura_terreno, punto_check.z)
 				es_bajada = false
 				break
-			elif diferencia_altura < -MIN_HEIGHT_JUMP:
+			elif diferencia_altura > MIN_HEIGHT_JUMP:
 				posicion_obstaculo = Vector3(punto_check.x, altura_terreno, punto_check.z)
 				es_bajada = true
 				break
@@ -943,10 +1058,59 @@ func actualizar_representacion_visual():
 	for nombre in objetivos.keys(): esferas["objetivo_" + nombre].position = objetivos[nombre]
 	esferas["punto_objetivo"].position = punto_objetivo
 
-func debe_avanzar():
+func debe_avanzar_sin_salto():
 	var dist = distancia(obtener_centro(), punto_objetivo)
 	var umbral_descanso = UMBRAL_DISTANCIA
 	return dist > umbral_descanso
+
+func debe_avanzar():
+	var dist = distancia(obtener_centro(), punto_objetivo)
+	var umbral_descanso = UMBRAL_DISTANCIA
+	
+	if intencion_salto_activa:
+		if abs(distancia(posicion_obstaculo, obtener_centro())) > abs(dist):
+			return true
+		return false
+	
+	return dist > umbral_descanso
+
+
+func hay_precipicio_adelante() -> bool:
+	var centro = obtener_centro()
+	var dir_norm = direccion.normalized()
+	
+	# Distancia de seguridad = tamaño del gato aproximadamente
+	var distancia_seguridad = DISTANCIA_ENTRE_PATAS * 4  # Como 4 veces el ancho del gato
+	
+	# Revisar múltiples puntos hacia adelante
+	for i in range(3):  # Revisar 3 puntos: centro, izquierda, derecha
+		var offset_lateral = Vector3.ZERO
+		
+		match i:
+			1: offset_lateral = Vector3(direccion.z, 0, -direccion.x) * (DISTANCIA_ENTRE_PATAS / 2)  # Izquierda
+			2: offset_lateral = Vector3(-direccion.z, 0, direccion.x) * (DISTANCIA_ENTRE_PATAS / 2)  # Derecha
+		
+		var punto_check = centro + dir_norm * distancia_seguridad + offset_lateral
+		var altura_terreno = obtener_punto_mas_alto(punto_check.x, punto_check.z, "suelo").y
+		var diferencia_altura = altura_terreno - centro.y
+		
+		# Si hay una caída significativa, es un precipicio
+		if diferencia_altura < -MIN_HEIGHT_JUMP:
+			return true
+	
+	return false
+	
+func hay_muro_adelante() -> bool:
+	var centro = obtener_centro()
+	var dir_norm = direccion.normalized()
+	var distancia_seguridad = DISTANCIA_ENTRE_PATAS * 3
+	
+	var punto_check = centro + dir_norm * distancia_seguridad
+	var altura_terreno = obtener_punto_mas_alto(punto_check.x, punto_check.z, "suelo").y
+	var diferencia_altura = altura_terreno - centro.y
+	
+	# Si hay una subida muy empinada, es un muro
+	return diferencia_altura > MIN_HEIGHT_JUMP
 
 func distancia(p1, p2):
 	return Vector2(p1.x - p2.x, p1.z - p2.z).length()

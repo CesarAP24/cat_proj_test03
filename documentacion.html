@@ -13,12 +13,25 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0a0f1a 0%, #1a2332 50%, #0f1419 100%);
-            color: #ffffff;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+    font-family: 'Inter', sans-serif;
+    background: #0a0f1a; /* Color sólido de respaldo */
+    color: #ffffff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Gradiente como pseudo-elemento fijo */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #0a0f1a 0%, #1a2332 50%, #0f1419 100%);
+    z-index: 0;
+}
 
         /* Background Grid Effect */
         .bg-grid {
@@ -239,6 +252,8 @@
             flex: 1;
             padding: 2rem;
             overflow-y: auto;
+            /* La siguiente línea es para evitar que se oculte en móviles */
+            margin-left: 0; 
         }
 
         .content-header {
@@ -456,30 +471,85 @@
             border-bottom-color: #00ffff;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 280px;
-            }
-            
-            .main-content {
-                padding: 1rem;
-            }
+/* ================================== */
+/* ==== ESTILOS RESPONSIVOS DOCS (VERSIÓN FINAL) ==== */
+/* ================================== */
 
-            .nav-buttons {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            
-            .nav-button {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .nav-button-content {
-                align-items: center !important;
-            }
-        }
+/* Botón hamburguesa con diseño futurista */
+.menu-toggle-btn {
+    display: none;
+    background: rgba(0, 60, 90, 0.8);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    color: #00ffff;
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0, 255, 255, 0.2);
+}
+
+.menu-toggle-btn:hover {
+    background: rgba(0, 100, 150, 0.9);
+    border-color: #00ffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 255, 255, 0.4);
+}
+
+.menu-toggle-btn svg {
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
+.sidebar-close-btn {
+    display: none;
+}
+
+/* Estilo para el botón de cerrar la sidebar */
+.sidebar-close-btn {
+    position: sticky; /* Se queda 'pegado' arriba */
+    top: 0;
+    float: right; /* Lo alinea a la derecha */
+    background: rgba(0, 40, 60, 0.5);
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+    width: 50px;
+    height: 50px;
+    margin: 0.5rem 0.5rem 0 0;
+    z-index: 1001;
+    border-radius: 8px;
+}
+.sidebar-close-btn:hover {
+    opacity: 1;
+}
+
+/* Media Query para tablets y móviles */
+@media (max-width: 992px) {
+    .menu-toggle-btn {
+        display: block; /* Muestra el botón hamburguesa */
+    }
+
+    .sidebar {
+        position: fixed;
+        left: 0; top: 0; height: 100vh;
+        z-index: 1000;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    
+    .sidebar.open .sidebar-close-btn {
+        display: block; /* Muestra el botón 'X' SOLO si la sidebar está abierta */
+    }
+}
     </style>
 </head>
 <body>
@@ -487,7 +557,10 @@
     
     <div class="container">
         <!-- Sidebar -->
-        <div class="sidebar">
+
+        <div class="sidebar" id="sidebar">
+            <button class="sidebar-close-btn" id="sidebar-close-btn">&times;</button>
+
             <div class="logo">
                 <h1>MISI DOCS</h1>
                 <p>Documentación del Proyecto</p>
@@ -505,6 +578,13 @@
         <!-- Main Content -->
         <div class="main-content">
             <div class="content-header">
+                <button class="menu-toggle-btn" id="menu-toggle-btn">
+                    <svg viewBox="0 0 100 80" width="25" height="25" fill="#00ffff">
+                        <rect width="100" height="15" rx="8"></rect>
+                        <rect y="30" width="100" height="15" rx="8"></rect>
+                        <rect y="60" width="100" height="15" rx="8"></rect>
+                    </svg>
+                </button>
                 <div class="breadcrumb" id="breadcrumb">
                     <a href="#" onclick="loadSection('MASTER')">🏠 Inicio</a>
                 </div>
@@ -777,6 +857,7 @@ Simplemente coloca tu archivo \`docs.md\` junto a este HTML.`;
                 
                 // Create parser (will trigger the event when loaded)
                 this.parser = new MarkdownParser();
+                this.setupResponsiveMenu();
             }
 
             setupURLRouting() {
@@ -1358,6 +1439,40 @@ Simplemente coloca tu archivo \`docs.md\` junto a este HTML.`;
                     document.querySelectorAll('.nav-item-toggle').forEach(el => el.classList.remove('expanded'));
                 }
             }
+            setupResponsiveMenu() {
+    const menuToggleBtn = document.getElementById('menu-toggle-btn');
+    const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
+    const sidebar = document.getElementById('sidebar');
+
+    if (menuToggleBtn && sidebar && sidebarCloseBtn) {
+        // El botón hamburguesa SOLO abre el menú
+        menuToggleBtn.addEventListener('click', () => {
+            sidebar.classList.add('open');
+        });
+
+        // El botón 'X' SOLO cierra el menú
+        sidebarCloseBtn.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+        });
+
+        // Cierra el menú al hacer clic en un enlace final
+        sidebar.addEventListener('click', (e) => {
+            const navSubitem = e.target.closest('.nav-subitem');
+            const navItem = e.target.closest('.nav-item');
+            
+            // Cierra si el clic es en un sub-item
+            if (navSubitem) {
+                setTimeout(() => sidebar.classList.remove('open'), 300);
+                return;
+            }
+            
+            // Cierra si el clic es en un nav-item que no tiene un botón de toggle
+            if (navItem && !navItem.querySelector('.nav-item-toggle')) {
+                setTimeout(() => sidebar.classList.remove('open'), 300);
+            }
+        });
+    }
+}
         }
 
         // Initialize the app

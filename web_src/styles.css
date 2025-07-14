@@ -4,7 +4,30 @@
     box-sizing: border-box;
 }
 
-body {
+/* ============================================= */
+/* ==== SOLUCIÓN DEFINITIVA PARA OVERSCROLL ==== */
+/* ============================================= */
+
+body::before {
+    /* Crea el pseudo-elemento */
+    content: ''; 
+
+    /* Lo posiciona de forma fija en toda la pantalla */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    /* Le asignamos el color de fondo oscuro */
+    background-color: #0a0f1a;
+
+    /* La magia: lo envía detrás de todo el contenido, incluido el <body> */
+    z-index: -1; 
+}
+
+html, body {
+    background-color: #0a0f1a; 
     font-family: 'Inter', sans-serif;
     background: linear-gradient(135deg, #0a0f1a 0%, #1a2332 50%, #0f1419 100%);
     color: #ffffff;
@@ -111,24 +134,25 @@ body {
     border-top: none;
 }
 
-/* Main Container */
 .container {
     display: flex;
+    width: 100%;
     min-height: 100vh;
-    z-index: 5;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    gap: 8rem;  /* Aumentamos el espacio entre logo y menú */
     position: relative;
+    z-index: 5;
 }
 
-/* Logo Section */
+/* 2. SECCIÓN DEL LOGO */
 .logo-section {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    padding: 2rem;
+    flex-shrink: 0; /* Evita que la sección del logo se encoja */
 }
-
 .cat-silhouette {
     height: 600px;
     backdrop-filter: blur(5px);
@@ -172,14 +196,10 @@ body {
 
 /* Menu Section */
 .menu-section {
-    /* flex: 1; */
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding: 2rem;
     gap: 1.5rem;
-    width: 40%;
-    margin-right: 10%;
+    width: 450px; /* Ancho fijo para el menú */
 }
 
 .menu-item {
@@ -424,20 +444,44 @@ body {
     transform: scale(1.1);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
+/* =================================== */
+/* ====   DISEÑO RESPONSIVO (NUEVO) ==== */
+/* =================================== */
+@media (max-width: 1024px) {
+    /* Hacemos que los elementos principales se apilen antes en pantallas de tablet */
     .container {
         flex-direction: column;
+        justify-content: center; /* Centramos el contenido verticalmente */
+        align-items: center; /* Centramos el contenido horizontalmente */
+        gap: 4rem; /* Añadimos un espacio entre el logo y el menú */
+        padding: 2rem 1rem; /* Añadimos un poco de padding para que no se pegue a los bordes */
     }
-    
-    .main-title {
-        font-size: 4rem;
+
+    .logo-section {
+        flex: 0; /* Reseteamos el crecimiento del flex */
     }
-    
+
+    .cat-silhouette {
+        height: 300px; /* Reducimos el tamaño del logo en pantallas más pequeñas */
+    }
+
     .menu-section {
-        padding: 1rem;
+        /* Eliminamos las propiedades problemáticas y dejamos que se ajuste solo */
+        width: 100%; /* El menú ocupará todo el ancho disponible */
+        max-width: 500px; /* Pero con un máximo para que no se estire demasiado en tablets */
+        margin: 0; /* Reseteamos los márgenes */
+        padding: 0 1rem; /* Ajustamos el padding */
     }
-    
+
+    .cat {
+        /* Ocultamos la imagen del gato de fondo en móviles para no sobrecargar */
+        display: none;
+    }
+}
+
+
+@media (max-width: 768px) {
+    /* Mantenemos tus ajustes para los marcos y añadimos otros para el contenido */
     .corner-frame {
         width: 40px;
         height: 40px;
@@ -448,20 +492,54 @@ body {
         height: 10px;
     }
 
-    .cat-silhouette{
-        height: 450px;
+    .content-section h2 {
+        font-size: 2rem; /* Reducimos el tamaño de los títulos en los pop-ups */
     }
 
-    .menu-section {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        max-width: 100%;
-        padding: 2rem;
-        width: 600px;
-        margin: auto;
-        gap: 1.5rem;
-        margin-top: -10rem;
+    .features-grid, .gallery-grid, .tech-specs {
+        /* Hacemos que las tarjetas tengan un tamaño mínimo más pequeño en móviles */
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+/* ============================================= */
+/* ====   ENLACE A DOCUMENTACIÓN BAJO LOGO   ==== */
+/* ============================================= */
+
+.docs-link-section {
+    margin-top: -5rem;
+    text-align: center;
+    padding: 1rem 1.5rem;
+    background: rgba(0, 40, 60, 0.2);
+    border: 1px solid rgba(0, 255, 255, 0.15);
+    border-radius: 8px;
+    max-width: 450px; /* Ancho máximo para que no se estire demasiado */
+    backdrop-filter: blur(5px);
+}
+
+.docs-link-section p {
+    color: #cccccc;
+    line-height: 1.6;
+    font-size: 0.9rem;
+}
+
+.docs-link-section a {
+    color: #00ffff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid transparent;
+}
+
+.docs-link-section a:hover {
+    border-bottom-color: #00ffff;
+}
+
+/* ================================================== */
+/* ====   AJUSTE FINAL SOLO PARA ESCRITORIO      ==== */
+/* ================================================== */
+@media (min-width: 1025px) {
+    .docs-link-section {
+        margin-top: -10rem; /* <-- El margen negativo solo se aplica aquí */
     }
 }
