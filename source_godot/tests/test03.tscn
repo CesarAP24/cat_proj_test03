@@ -1,10 +1,14 @@
-[gd_scene load_steps=8 format=3 uid="uid://dkpedmbd384id"]
+[gd_scene load_steps=9 format=3 uid="uid://dkpedmbd384id"]
 
 [ext_resource type="Script" uid="uid://c0kae6f0h1cyc" path="res://scripts/Main/main.gd" id="1_mrabx"]
 [ext_resource type="Script" uid="uid://di8sk7kmiq0wr" path="res://scripts/Main/audio_listener_3d.gd" id="2_4rhi5"]
 [ext_resource type="Script" uid="uid://cyykjr8fvts8h" path="res://scripts/Main/Camera.gd" id="2_v4jus"]
 [ext_resource type="PackedScene" uid="uid://cppicxpa1x7l5" path="res://assets/black_model.tscn" id="4_4rhi5"]
 [ext_resource type="PackedScene" uid="uid://cw6xnniivw4rx" path="res://assets/salsa_dancing.tscn" id="4_osey5"]
+
+[sub_resource type="Environment" id="Environment_nij2p"]
+ssr_enabled = true
+fog_enabled = true
 
 [sub_resource type="BoxShape3D" id="2"]
 
@@ -23,6 +27,7 @@ objetivo_path = NodePath("..")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(0.999964, -0.00224809, 0.00812667, -0.0052107, 0.592981, 0.8052, -0.00662912, -0.805213, 0.592948, 0, 36.7529, 5.87417)
+environment = SubResource("Environment_nij2p")
 current = true
 fov = 82.6
 near = 0.1
@@ -103,6 +108,60 @@ transform = Transform3D(33.5871, 0, 0, 0, 87.1216, 0, 0, 0, 251.223, 89.7974, -0
 shape = SubResource("2")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody15" groups=["suelo"]]
+mesh = SubResource("3")
+
+[node name="StaticBody18" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
+transform = Transform3D(266.46, 0, 0, 0, 87.1217, 0, 0, -5.96046e-08, 251.223, 302.389, 1.04677, 10.3758)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody18" groups=["suelo"]]
+shape = SubResource("2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody18" groups=["suelo"]]
+mesh = SubResource("3")
+
+[node name="StaticBody19" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
+transform = Transform3D(266.46, 0, 0, 0, 87.1218, -1.19209e-07, 0, -1.78814e-07, 251.223, 394.553, 12.1302, 10.2464)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody19" groups=["suelo"]]
+shape = SubResource("2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody19" groups=["suelo"]]
+mesh = SubResource("3")
+
+[node name="StaticBody20" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
+transform = Transform3D(266.46, 0, 0, 0, 87.1218, -1.19209e-07, 0, -2.08616e-07, 251.223, 406.548, 15.3903, 10.2358)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody20" groups=["suelo"]]
+shape = SubResource("2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody20" groups=["suelo"]]
+mesh = SubResource("3")
+
+[node name="StaticBody21" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
+transform = Transform3D(266.46, 0, 0, 0, 87.1219, -1.19209e-07, 0, -2.38419e-07, 251.223, 420.018, 22.4978, 10.2129)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody21" groups=["suelo"]]
+shape = SubResource("2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody21" groups=["suelo"]]
+mesh = SubResource("3")
+
+[node name="StaticBody22" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
+transform = Transform3D(85.8333, 0, 0, 0, 105.743, 1.19209e-07, 0, -4.17233e-07, 250.998, 456.064, 56.292, 10.1038)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody22" groups=["suelo"]]
+shape = SubResource("2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody22" groups=["suelo"]]
+mesh = SubResource("3")
+
+[node name="StaticBody23" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
+transform = Transform3D(266.46, 0, 0, 0, 87.122, -1.19209e-07, 0, -3.8743e-07, 251.223, 573.232, 18.3972, 10.2261)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody23" groups=["suelo"]]
+shape = SubResource("2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/StaticBody23" groups=["suelo"]]
 mesh = SubResource("3")
 
 [node name="StaticBody12" type="StaticBody3D" parent="Node3D" groups=["suelo"]]
@@ -260,3 +319,19 @@ light_energy = 16.0
 light_volumetric_fog_energy = 4.717
 spot_range = 74.7805
 spot_angle = 29.4748
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.633229, -0.483126, -0.604657, 0.261242, -0.601977, 0.754571, -0.728542, -0.635778, -0.254976, 0, 20.9217, -0.0920193)
+light_energy = 1.516
+shadow_enabled = true
+shadow_blur = 1.242
+directional_shadow_max_distance = 239.2
+directional_shadow_pancake_size = 0.0
+
+[node name="DirectionalLight3D2" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.164482, -0.842447, 0.513058, -0.930466, 0.0401183, 0.364175, -0.327381, -0.537284, -0.77727, 0, 20.9217, -0.0920193)
+light_energy = 0.5
+shadow_enabled = true
+shadow_blur = 1.242
+directional_shadow_max_distance = 239.2
+directional_shadow_pancake_size = 0.0

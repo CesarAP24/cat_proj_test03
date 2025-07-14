@@ -5,7 +5,6 @@ res://addons/so_fluffy/so_fluffy.gdshader
 res://materials/window_material.tres
 res://materials/frame_material.tres
 res://assets/cielo/stylized-sky.gdshader
-res://scripts/Main/main.gd
 res://tests/test03.tscn
 res://tests/city_test_day.tscn
 res://assets/cielo/Day.tscn

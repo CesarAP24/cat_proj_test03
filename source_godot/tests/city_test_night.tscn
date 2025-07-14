@@ -49,7 +49,7 @@ DISTANCIA_MINIMA_COLA = 0.01
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.575619, -0.538386, -0.61547, 0.682238, -0.0987348, 0.724433, -0.450793, -0.836894, 0.310473, 6.9404, 0, 0)
-light_energy = 0.5
+light_energy = 3.709
 light_volumetric_fog_energy = 7.0
 light_specular = 0.0
 shadow_enabled = true
