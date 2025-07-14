@@ -27,10 +27,10 @@ func config(base_quad: Array[Vector3], square_threshold := 0.15) -> Dictionary:
 	var scale = 10
 	
 	var random_floors = rng.randf_range(1, 2)
-	var floor_height = rng.randf_range(3, 3.5)  # Altura por piso
+	var floor_height = rng.randf_range(3, 4)  # Altura por piso
 	var height = snapped(random_floors * floor_height * scale, 0.01)
 	# Altura del techo (60% - 85% de un piso)
-	var roof_percent = rng.randf_range(0.2, 0.32)
+	var roof_percent = rng.randf_range(0.1, 0.2)
 	var height_roof = snapped(height * roof_percent, 0.01)
 
 	# Tipo de techo (según cantidad de vértices)

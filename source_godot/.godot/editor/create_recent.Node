@@ -1,7 +1,7 @@
+DirectionalLight3D
 Fur
 CSGSphere3D
 MeshInstance3D
-DirectionalLight3D
 SpotLight3D
 AspectRatioContainer
 OmniLight3D
