@@ -13,3 +13,4 @@ res://tests/menu.tscn
 res://assets/black_model.tscn
 res://tests/abandoned.tscn
 res://tests/thegreat.tscn
+res://scripts/Main/menu.gd

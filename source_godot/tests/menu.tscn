@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://mmk0xre0slh7"]
+[gd_scene load_steps=10 format=3 uid="uid://mmk0xre0slh7"]
 
 [ext_resource type="Script" uid="uid://8nb11l1l4a15" path="res://scripts/Main/menu.gd" id="1_f7jwa"]
 [ext_resource type="Texture2D" uid="uid://t0rqmt8rhu82" path="res://assets/car.png" id="2_f7jwa"]
 [ext_resource type="Texture2D" uid="uid://4ujdmaacecqx" path="res://assets/logo.png" id="2_kn4nj"]
 [ext_resource type="Texture2D" uid="uid://c5xcu7k6yghfk" path="res://textures/fondo.png" id="2_qafqv"]
+[ext_resource type="FontFile" uid="uid://c6qhjn344ehq7" path="res://assets/SquadaOne-Regular.ttf" id="5_qafqv"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f7jwa"]
 bg_color = Color(0.301961, 0.909804, 0.941176, 1)
@@ -24,21 +25,29 @@ border_width_right = 1
 border_color = Color(0.113725, 0.541176, 0.654902, 1)
 corner_radius_bottom_left = 1
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6muo2"]
-bg_color = Color(0.2496, 0.75348, 0.78, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c8vnd"]
-bg_color = Color(0.1105, 0.533108, 0.65, 0.380392)
-border_width_left = 3
-border_color = Color(0.388127, 0.878575, 0.972094, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
+bg_color = Color(0.23, 0.23, 0.23, 0.109804)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.172549, 0.956863, 0.984314, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6muo2"]
+bg_color = Color(0.0918129, 0.16049, 0.206288, 0.564706)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.172549, 0.956863, 0.984314, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [node name="MenuGato" type="Control"]
 layout_mode = 3
@@ -72,10 +81,10 @@ expand_mode = 1
 
 [node name="TextureRect2" type="TextureRect" parent="."]
 layout_mode = 0
-offset_left = 806.0
-offset_top = 459.0
-offset_right = 980.0
-offset_bottom = 619.0
+offset_left = 202.0
+offset_top = 170.0
+offset_right = 500.0
+offset_bottom = 450.0
 texture = ExtResource("2_kn4nj")
 expand_mode = 1
 
@@ -200,47 +209,51 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_qafqv")
 
 [node name="Buscador" type="Node2D" parent="."]
 
+[node name="GREAT" type="Button" parent="Buscador"]
+offset_left = 626.0
+offset_top = 230.0
+offset_right = 917.0
+offset_bottom = 300.0
+theme_override_fonts/font = ExtResource("5_qafqv")
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("StyleBoxFlat_c8vnd")
+text = "   [♦]   THE GREAT"
+alignment = 0
+
 [node name="mandarSeed" type="Button" parent="Buscador"]
-offset_left = 671.0
-offset_top = 282.0
-offset_right = 731.0
-offset_bottom = 341.0
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_colors/font_color = Color(0.958745, 0.916551, 0.867767, 1)
-theme_override_constants/outline_size = 20
+offset_left = 628.0
+offset_top = 124.0
+offset_right = 919.0
+offset_bottom = 198.0
+theme_override_fonts/font = ExtResource("5_qafqv")
+theme_override_font_sizes/font_size = 25
 theme_override_styles/normal = SubResource("StyleBoxFlat_6muo2")
+text = "   [ > ]   ROOF"
+alignment = 0
 
-[node name="Label" type="Label" parent="Buscador/mandarSeed"]
-layout_mode = 0
-offset_left = 19.0
-offset_top = 3.0
-offset_right = 87.0
-offset_bottom = 58.0
-theme_override_font_sizes/font_size = 40
-text = "→"
+[node name="Egg" type="Button" parent="Buscador"]
+offset_left = 627.0
+offset_top = 429.0
+offset_right = 913.0
+offset_bottom = 492.0
+theme_override_fonts/font = ExtResource("5_qafqv")
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("StyleBoxFlat_c8vnd")
+text = "   [ * ]   EASTER EGG"
+alignment = 0
 
-[node name="Panel" type="Panel" parent="Buscador"]
-offset_left = 285.0
-offset_top = 281.0
-offset_right = 653.0
-offset_bottom = 340.0
-rotation = 0.00382375
-theme_override_styles/panel = SubResource("StyleBoxFlat_c8vnd")
+[node name="Test" type="Button" parent="Buscador"]
+offset_left = 628.0
+offset_top = 333.0
+offset_right = 915.0
+offset_bottom = 401.0
+theme_override_fonts/font = ExtResource("5_qafqv")
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("StyleBoxFlat_c8vnd")
+text = "   [<>]   TEST"
+alignment = 0
 
-[node name="Label" type="Label" parent="Buscador"]
-offset_left = 299.0
-offset_top = 235.0
-offset_right = 404.0
-offset_bottom = 258.0
-text = "Ingresar seed"
-
-[node name="LineEdit" type="LineEdit" parent="Buscador"]
-offset_left = 286.0
-offset_top = 281.0
-offset_right = 653.0
-offset_bottom = 343.0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 20
-alignment = 1
-
+[connection signal="pressed" from="Buscador/GREAT" to="." method="_on_great_pressed"]
 [connection signal="pressed" from="Buscador/mandarSeed" to="." method="_on_jugar_pressed"]
+[connection signal="pressed" from="Buscador/Egg" to="." method="_on_egg_pressed"]
+[connection signal="pressed" from="Buscador/Test" to="." method="_on_test_pressed"]
